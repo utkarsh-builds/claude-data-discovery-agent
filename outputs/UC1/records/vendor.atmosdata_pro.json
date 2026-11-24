@@ -1,0 +1,95 @@
+{
+  "source_id": "vendor.atmosdata_pro",
+  "kind": "vendor_feed",
+  "title": "AtmosData Pro station-grade weather feed (fictional vendor)",
+  "location": "https://api.atmosdata.example/v2/observations",
+  "status": "deprecated",
+  "summary": "A vendor-supplied REST feed for station-grade hourly weather observations (including temperature and humidity). The feed was under contract AD-2021-114 from 2022-01-01 to 2025-12-31, but the agreement has expired, the renewal has not been signed, and the API key was revoked on 2026-01-01. The external register lists no approved purposes. This source cannot be reached or used for any window until a new agreement is signed. The fallback for N3 (hourly weather) is the Open-Meteo public API, which is already registered.",
+  "schema": {
+    "documented": "none",
+    "fields": [],
+    "field_count": null,
+    "notes": "No schema documentation is available — the terms URL was null in the register and no docs URL was provided. The feed format cannot be probed because the API key is revoked."
+  },
+  "temporal": {
+    "start": null,
+    "end": null,
+    "grain": "unknown",
+    "refresh_cadence": null,
+    "metadata_last_updated": null
+  },
+  "spatial": {
+    "coverage": [],
+    "code_system": null,
+    "notes": "Spatial coverage was never documented and cannot be determined from the unreachable feed."
+  },
+  "ownership": {
+    "owner": "AtmosData (fictional vendor)",
+    "steward": null,
+    "publisher": null
+  },
+  "licence": {
+    "name": null,
+    "url": null,
+    "commercial_use": "unknown",
+    "mixed_sources": null,
+    "attribution_text": null,
+    "agreement_status": "expired — Contract AD-2021-114 ran 2022-01-01 to 2025-12-31. Renewal pending Procurement, no signed renewal on file.",
+    "evidence": "list_external_register() output for source_id=vendor.atmosdata_pro: agreement_status=expired, agreement_detail states contract dates and renewal status"
+  },
+  "access": {
+    "method": "rest_api",
+    "auth_required": true,
+    "request_process": "API key needed; was revoked 2026-01-01. Renewal requires a signed agreement through Procurement.",
+    "reachable": false,
+    "approx_size_bytes": null,
+    "classification": null
+  },
+  "declared_metadata": {
+    "agreement_status": "expired",
+    "approved_purposes": [],
+    "api_key_revoked": true
+  },
+  "documentation_excerpts": [],
+  "quality_notes": [
+    "Agreement expired 2025-12-31 (AD-2021-114) and not renewed.",
+    "API key revoked 2026-01-01 — the feed is unreachable.",
+    "No approved purposes were ever listed in the register.",
+    "No docs_url or terms_url were provided in the register entry.",
+    "Cannot be used for any target window; Open-Meteo is the registered fallback for N3."
+  ],
+  "provenance": [
+    {
+      "claim": "Agreement status is 'expired' with contract AD-2021-114 covering 2022-01-01 to 2025-12-31",
+      "evidence": "list_external_register() for source_id=vendor.atmosdata_pro, field agreement_status=expired and agreement_detail"
+    },
+    {
+      "claim": "API key was revoked on 2026-01-01",
+      "evidence": "list_external_register() for source_id=vendor.atmosdata_pro, field auth='API key (revoked 2026-01-01)'"
+    },
+    {
+      "claim": "No approved purposes are listed for this source",
+      "evidence": "list_external_register() for source_id=vendor.atmosdata_pro, field approved_purposes=[]"
+    },
+    {
+      "claim": "The feed endpoint is https://api.atmosdata.example/v2/observations",
+      "evidence": "list_external_register() for source_id=vendor.atmosdata_pro, field endpoint"
+    },
+    {
+      "claim": "No documentation URL or terms URL were provided",
+      "evidence": "list_external_register() for source_id=vendor.atmosdata_pro, fields docs_url=null, terms_url=null"
+    },
+    {
+      "claim": "No internal wiki or catalog entry mentions AtmosData Pro",
+      "evidence": "search_internal_catalog('AtmosData Pro weather vendor agreement expired') returned zero hits"
+    }
+  ],
+  "unknowns": [
+    "Temporal coverage of the data (start/end dates, refresh cadence) — never documented",
+    "Spatial coverage — never documented",
+    "Schema and field list — no docs URL provided, feed unreachable",
+    "Licence terms — no terms_url provided",
+    "Approx data volume — never documented",
+    "Data quality — feed cannot be probed"
+  ]
+}

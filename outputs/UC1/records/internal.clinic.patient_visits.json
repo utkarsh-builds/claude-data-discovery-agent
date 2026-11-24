@@ -1,0 +1,125 @@
+{
+  "source_id": "internal.clinic.patient_visits",
+  "kind": "internal",
+  "title": "Clinic visits (one row per patient visit)",
+  "location": "azure://valdena-health/clinic/patient_visits",
+  "status": "active",
+  "summary": "One row per patient visit from Valdena's clinic system, with pseudonymised patient key, visit timestamp, age band, postcode and diagnosis code. Contains 900k rows covering from 2019 to present, refreshed daily. However, the clinic data policy (wiki: clinic_data_policy, last edited 2025-02-01) explicitly prohibits using this patient-level table for this analysis — only daily district counts may be used. The table contains personal data (pseudonymised patient key, age band, postcode) and requires Data Protection Office approval which has not been granted for this use case.",
+  "schema": {
+    "documented": "structured",
+    "fields": [
+      {
+        "name": "patient_key",
+        "type": "string",
+        "description": "Pseudonymised patient key",
+        "pii": true
+      },
+      {
+        "name": "visit_ts",
+        "type": "timestamp",
+        "description": "Visit time",
+        "pii": false
+      },
+      {
+        "name": "age_band",
+        "type": "string",
+        "description": "Five-year age band",
+        "pii": true
+      },
+      {
+        "name": "postcode",
+        "type": "string",
+        "description": "Patient postcode",
+        "pii": true
+      },
+      {
+        "name": "diagnosis_code",
+        "type": "string",
+        "description": "Diagnosis code",
+        "pii": false
+      }
+    ],
+    "field_count": 5,
+    "notes": "All columns documented in catalog entry. Three columns flagged as PII."
+  },
+  "temporal": {
+    "start": "2019-01-01",
+    "end": null,
+    "open_ended": true,
+    "grain": "event",
+    "refresh_cadence": "daily"
+  },
+  "spatial": {
+    "coverage": [
+      "IT"
+    ],
+    "code_system": "postcode (IT)",
+    "notes": "Geography is via patient postcode field (Italian CAP codes). Only Valdena-area clinics."
+  },
+  "ownership": {
+    "owner": "Clinical Records",
+    "steward": "Marta Greco",
+    "publisher": null
+  },
+  "licence": {
+    "name": "internal",
+    "commercial_use": "not_applicable",
+    "mixed_sources": false,
+    "evidence": "Catalog entry classification='restricted', contains_pii=true; wiki: clinic_data_policy prohibits surveillance use."
+  },
+  "access": {
+    "method": "warehouse_sql",
+    "auth_required": true,
+    "request_process": "Data Protection Office approval required — not granted for this use case",
+    "reachable": true,
+    "approx_size_bytes": null,
+    "classification": "restricted"
+  },
+  "declared_metadata": {
+    "contains_pii": true,
+    "row_count_approx": 900000,
+    "grain": "event"
+  },
+  "documentation_excerpts": [
+    "Catalog entry: 'contains_pii': true, classification: 'restricted'",
+    "Wiki clinic_data_policy: 'Patient-level visit records (clinic.patient_visits) may not be used for this analysis.'",
+    "Wiki clinic_data_policy: 'Patient postcode and age band are personal data. They must not leave the clinic systems for analysis.'"
+  ],
+  "quality_notes": [
+    "Clinic data policy (wiki page, last edited 2025-02-01) explicitly prohibits using this patient-level table for the surveillance use case. Only daily aggregate counts (clinic.resp_visits_daily) are approved.",
+    "Catalog entry (exported 2026-10-14) shows status=active, but the wiki policy overrides for this specific purpose.",
+    "Contains PII (patient_key, age_band, postcode) — special category data under GDPR.",
+    "Access requires Data Protection Office approval, which has not been granted for this use case."
+  ],
+  "provenance": [
+    {
+      "claim": "Table has 5 columns: patient_key, visit_ts, age_band, postcode, diagnosis_code",
+      "evidence": "get_catalog_entry('internal.clinic.patient_visits') -> columns"
+    },
+    {
+      "claim": "Table contains PII (patient_key, age_band, postcode are flagged as pii=true)",
+      "evidence": "get_catalog_entry('internal.clinic.patient_visits') -> columns[0,2,3].pii = true"
+    },
+    {
+      "claim": "Patient-level records may NOT be used for this analysis per clinic data policy",
+      "evidence": "read_wiki_page('clinic_data_policy') -> 'Patient-level visit records (clinic.patient_visits) may not be used for this analysis.'"
+    },
+    {
+      "claim": "Access requires Data Protection Office approval",
+      "evidence": "get_catalog_entry('internal.clinic.patient_visits') -> access.request_process = 'Data Protection Office approval'"
+    },
+    {
+      "claim": "Temporal coverage from 2019-01-01, open-ended, refreshed daily",
+      "evidence": "get_catalog_entry('internal.clinic.patient_visits') -> temporal_coverage.start='2019-01-01', end=null, refresh_cadence='daily'"
+    },
+    {
+      "claim": "Owner is Clinical Records, steward is Marta Greco",
+      "evidence": "get_catalog_entry('internal.clinic.patient_visits') -> owner='Clinical Records', steward='Marta Greco'"
+    }
+  ],
+  "unknowns": [
+    "Approx data size in bytes (not stated in catalog)",
+    "Exact number of clinics contributing (not stated)",
+    "Specific diagnosis code system/ontology used (not described)"
+  ]
+}

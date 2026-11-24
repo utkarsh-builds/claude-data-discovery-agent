@@ -1,0 +1,121 @@
+{
+  "source_id": "internal.store.calendar",
+  "kind": "internal",
+  "title": "Shop calendar",
+  "location": "azure://valdena-gelato/store/calendar",
+  "status": "active",
+  "summary": "Daily calendar of opening days, closures and local events for the Valdena gelato shop in northern Italy. Contains one row per day from 2022-01-01 onward with a boolean flag for whether the shop was open and an optional text field naming local events. The source is updated weekly and is open to analytics roles. It covers the full history and recent windows needed (through 2026-03-31).",
+  "schema": {
+    "documented": "structured",
+    "fields": [
+      {
+        "name": "calendar_date",
+        "type": "date",
+        "description": "Day",
+        "pii": false
+      },
+      {
+        "name": "is_open",
+        "type": "boolean",
+        "description": "Whether the shop was open",
+        "pii": false
+      },
+      {
+        "name": "event_name",
+        "type": "string",
+        "description": "Local event that day, if any",
+        "pii": false
+      }
+    ],
+    "field_count": 3,
+    "notes": "Three columns: date, open/closed boolean, and optional event name. No schema-level issues declared."
+  },
+  "temporal": {
+    "start": "2022-01-01",
+    "end": null,
+    "open_ended": true,
+    "grain": "daily",
+    "refresh_cadence": "weekly",
+    "metadata_last_updated": "2026-10-14"
+  },
+  "spatial": {
+    "coverage": [
+      "IT"
+    ],
+    "code_system": null,
+    "notes": "Single shop in northern Italy (Valdena). No explicit location identifier in the schema beyond the shop context."
+  },
+  "ownership": {
+    "owner": "Store Operations",
+    "steward": "Elena Russo",
+    "publisher": null
+  },
+  "licence": {
+    "name": "internal",
+    "url": null,
+    "commercial_use": "not_applicable",
+    "mixed_sources": false,
+    "attribution_text": null,
+    "agreement_status": null,
+    "evidence": "catalog field classification = 'internal' and contains_pii = false"
+  },
+  "access": {
+    "method": "warehouse_sql",
+    "auth_required": true,
+    "request_process": "Open to analytics roles",
+    "reachable": true,
+    "approx_size_bytes": null,
+    "classification": "internal"
+  },
+  "declared_metadata": {
+    "contains_pii": false,
+    "row_count_approx": 1500,
+    "grain": "daily",
+    "status": "active"
+  },
+  "documentation_excerpts": [
+    "Opening days, closures and local events for the shop. (catalog description)",
+    "Open to analytics roles (catalog access request_process)",
+    "Refresh cadence: weekly (catalog field)",
+    "Last refreshed: 2026-10-10 (catalog field)"
+  ],
+  "quality_notes": [
+    "No wiki backlinks exist — coverage completeness and data quality not independently verified.",
+    "event_name may be sparse (catalog notes 'if any' for local events).",
+    "Temporal coverage end is null — the table appears to be still updating. Last refreshed 2026-10-10, so the recent window (through 2026-03-31) is covered.",
+    "No catalog vs wiki disagreements: the catalog is the only source of documentation (no wiki pages exist for this table)."
+  ],
+  "provenance": [
+    {
+      "claim": "Source is internal, daily-grain calendar with columns calendar_date, is_open, event_name",
+      "evidence": "get_catalog_entry('internal.store.calendar') — columns list"
+    },
+    {
+      "claim": "Owner is Store Operations, steward is Elena Russo",
+      "evidence": "get_catalog_entry('internal.store.calendar') — owner and steward fields"
+    },
+    {
+      "claim": "Temporal coverage from 2022-01-01 onward, still updating (end = null), refreshed weekly",
+      "evidence": "get_catalog_entry('internal.store.calendar') — temporal_coverage, refresh_cadence, last_refreshed"
+    },
+    {
+      "claim": "No wiki documentation found (zero backlinks, no dedicated wiki page)",
+      "evidence": "get_catalog_entry('internal.store.calendar') — wiki_backlinks = []"
+    },
+    {
+      "claim": "Access is warehouse SQL, open to analytics roles",
+      "evidence": "get_catalog_entry('internal.store.calendar') — access method and request_process"
+    },
+    {
+      "claim": "Internal licence, no commercial use restriction applicable",
+      "evidence": "get_catalog_entry('internal.store.calendar') — classification = 'internal', contains_pii = false"
+    }
+  ],
+  "unknowns": [
+    "Whether event_name is populated for all local events or only major ones (catalog says 'if any').",
+    "Exact geographic location (town/region) of the Valdena shop is not captured in the table.",
+    "Size in bytes is unknown; approximate row count is ~1,500.",
+    "No explicit date format specification beyond 'date' type."
+  ],
+  "sample_findings": []
+}

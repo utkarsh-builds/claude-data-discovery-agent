@@ -1,0 +1,161 @@
+{
+  "source_id": "api.open_meteo_archive",
+  "kind": "public_api",
+  "title": "Open-Meteo Historical Weather API (ERA5 reanalysis)",
+  "location": "https://archive-api.open-meteo.com/v1/archive",
+  "status": "active",
+  "summary": "Daily maximum temperature (temperature_2m_max) from Open-Meteo's Historical Weather API, which uses ERA5 and ERA5-Land reanalysis from Copernicus ECMWF. Data is available from 1940 to near-realtime at 0.25° to 0.1° resolution, and from 2017 also with ECMWF IFS at 9 km resolution. The API delivers gap-free daily aggregates for any GPS coordinate. Probes for Milan (45.4642°N, 9.1900°E) for both the history window (June 2023) and recent window (June 2025) returned full daily max/min temperatures in °C. The free tier is for non-commercial evaluation only; commercial use (Valdena Gelato Shop) requires a paid subscription. The data is licensed under CC BY 4.0 with attribution required.",
+  "schema": {
+    "documented": "structured",
+    "fields": [
+      {
+        "name": "daily.time",
+        "type": "string",
+        "unit": "iso8601 date",
+        "description": "Date in YYYY-MM-DD format"
+      },
+      {
+        "name": "daily.temperature_2m_max",
+        "type": "float",
+        "unit": "°C",
+        "description": "Daily maximum temperature at 2 metres above ground"
+      },
+      {
+        "name": "daily.temperature_2m_min",
+        "type": "float",
+        "unit": "°C",
+        "description": "Daily minimum temperature at 2 metres above ground"
+      },
+      {
+        "name": "daily.temperature_2m_mean",
+        "type": "float",
+        "unit": "°C",
+        "description": "Daily mean temperature (available on request)"
+      },
+      {
+        "name": "daily.sunshine_duration",
+        "type": "float",
+        "unit": "seconds",
+        "description": "Daily sunshine duration (available on request)"
+      },
+      {
+        "name": "daily.precipitation_sum",
+        "type": "float",
+        "unit": "mm",
+        "description": "Daily precipitation sum (available on request)"
+      },
+      {
+        "name": "daily.rain_sum",
+        "type": "float",
+        "unit": "mm",
+        "description": "Daily rain sum (available on request)"
+      },
+      {
+        "name": "daily.snowfall_sum",
+        "type": "float",
+        "unit": "cm",
+        "description": "Daily snowfall sum (available on request)"
+      },
+      {
+        "name": "hourly.temperature_2m",
+        "type": "float",
+        "unit": "°C",
+        "description": "Hourly temperature (available on request)"
+      },
+      {
+        "name": "hourly.shortwave_radiation",
+        "type": "float",
+        "unit": "W/m²",
+        "description": "Hourly shortwave radiation (available on request)"
+      }
+    ],
+    "field_count": 10,
+    "notes": "Only daily.temperature_2m_max is mandatory for N3. All requested daily variables return simultaneously. Latitude/longitude of the shop is required."
+  },
+  "temporal": {
+    "start": "1940-01-01",
+    "end": null,
+    "open_ended": true,
+    "grain": "daily",
+    "refresh_cadence": "static for historical reanalysis (ERA5 periodically extended)"
+  },
+  "spatial": {
+    "coverage": [
+      "IT"
+    ],
+    "code_system": "decimal degrees (WGS84)",
+    "notes": "Grid-interpolated (ERA5 0.25° ~28 km, ERA5-Land 0.1° ~11 km, IFS from 2017 at 9 km). Nearest grid cell to the shop coordinates is used."
+  },
+  "ownership": {
+    "owner": "Open-Meteo GmbH",
+    "publisher": "Open-Meteo.com (Patrick Zippenfenig)"
+  },
+  "licence": {
+    "name": "CC BY 4.0",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "commercial_use": "yes",
+    "mixed_sources": true,
+    "attribution_text": "Weather data by Open-Meteo.com (https://open-meteo.com/)",
+    "agreement_status": "not_required_open_data (free tier non-commercial); commercial use needs paid subscription",
+    "evidence": "probe_url https://open-meteo.com/en/licence: 'API data are offered under Attribution 4.0 International (CC BY 4.0)'. probe_url https://open-meteo.com/en/pricing: 'Commercial Use Licence - A subscription grants a commercial use licence'."
+  },
+  "access": {
+    "method": "rest_api",
+    "auth_required": true,
+    "request_process": "Free tier: no API key, non-commercial only. Commercial: subscribe at https://open-meteo.com/en/pricing (Standard/Professional/Enterprise) for API key and dedicated endpoint customer-api.open-meteo.com.",
+    "reachable": true,
+    "classification": "open_data"
+  },
+  "declared_metadata": {
+    "has_missing_values": "no (gap-free reanalysis)",
+    "contains_pii": false,
+    "rate_limits_free_tier": "10000 calls/day, 5000 calls/hour, 600 calls/minute",
+    "rate_limits_paid": "Unlimited on Standard/Professional; 1M/5M calls/month budget"
+  },
+  "documentation_excerpts": [
+    "Gap-free and consistent historical weather data using weather reanalysis from ERA5 (0.25°, from 1940) and ERA5-Land (0.1°, from 1950) and ECMWF IFS (9 km, from 2017).",
+    "Commercial Use Licence: A subscription grants a commercial use licence and an API key for the dedicated customer endpoint at customer-api.open-meteo.com.",
+    "Attribution: You must give appropriate credit, provide a link to the licence, and indicate if changes were made.",
+    "Non-Commercial Use: By using the Free API for non-commercial use you agree... less than 10,000 API calls per day, 5,000 per hour and 600 per minute."
+  ],
+  "quality_notes": [
+    "ERA5 reanalysis is a grid-interpolated model, not a local ground station — actual temperatures at the shop location may differ from the nearest grid cell (up to 28 km on ERA5, ~11 km on ERA5-Land, 9 km on IFS).",
+    "Free tier is non-commercial only; Valdena Gelato Shop (commercial entity) requires a paid subscription. Register lists as approved for production, implying subscription is obtainable.",
+    "Data provided as-is with no warranty (see terms: 'Open-Meteo assumes no responsibility for any inaccuracies').",
+    "Hourly and daily variables can be requested together in one call. Daily temperature_2m_max is directly available."
+  ],
+  "provenance": [
+    {
+      "claim": "The API is registered and approved for UC2 (prototyping and production)",
+      "evidence": "list_external_register source_id='api.open_meteo_archive', approved_purposes=['prototyping','production']"
+    },
+    {
+      "claim": "The API returns daily temperature_2m_max in °C for northern Italy coordinates",
+      "evidence": "call_public_api lat=45.4642, lon=9.1900, daily=['temperature_2m_max','temperature_2m_min'] returned 25.3, 25.7, 24.9 °C for 2023-06-01 to 2023-06-03"
+    },
+    {
+      "claim": "The API covers both required windows (1940 to near-realtime)",
+      "evidence": "call_public_api proved 2023-06-01 and 2025-06-01 both work; docs page: 'from 1940 until now'"
+    },
+    {
+      "claim": "Licence is CC BY 4.0 with attribution; free tier non-commercial only",
+      "evidence": "probe_url https://open-meteo.com/en/licence: 'API data are offered under Attribution 4.0 International (CC BY 4.0)'. probe_url https://open-meteo.com/en/terms: free tier 'for non-commercial purposes'"
+    },
+    {
+      "claim": "Commercial use requires a paid subscription",
+      "evidence": "probe_url https://open-meteo.com/en/pricing: 'Commercial Use Licence - A subscription grants a commercial use licence'"
+    }
+  ],
+  "unknowns": [
+    "Exact ERA5 grid cell offset from the shop's precise address (depends on which coordinate is chosen)",
+    "Whether the shop/analyst already holds a paid subscription or will need to obtain one",
+    "Exact API response size per call for the full 2-year window (depends on number of variables requested)"
+  ],
+  "canonical_ref": "https://archive-api.open-meteo.com/v1/archive",
+  "sample_findings": [
+    "Probe 2023-06-01 to 2023-06-03: daily.temperature_2m_max = [25.3, 25.7, 24.9] °C, daily.temperature_2m_min = [15.5, 16.1, 16.4] °C — plausible summer values for Milan",
+    "Hourly temperature_2m ranged from ~16.4 °C (night) to ~25.3 °C (day)",
+    "No missing values, no sentinel values, no negative temperatures in the sample",
+    "Coordinates automatically snapped from (45.4642, 9.1900) to nearest grid cell (45.448154, 9.169279), elevation 147 m"
+  ]
+}

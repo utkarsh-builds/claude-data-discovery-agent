@@ -1,0 +1,106 @@
+{
+  "candidates": [
+    {
+      "source_id": "internal.sales.daily_by_product",
+      "kind": "internal",
+      "title": "Daily sales by product",
+      "location": "azure://valdena-gelato/sales/daily_by_product",
+      "need_ids": [
+        "N1"
+      ],
+      "target_windows": [
+        "history",
+        "recent"
+      ],
+      "why_relevant": "Daily units sold and revenue per product from the till system. Covers both windows. Grain: daily. Has sale_date, product_code, units_sold, revenue_eur columns.",
+      "found_via": "search_internal_catalog 'daily ice cream sales by product Valdena'",
+      "suspected_issues": [
+        "Till system replacement 2024-02-05 to 2024-03-10 — no sales recorded (wiki: till_migration_2024)",
+        "Product codes changed 2024-04-01 — old codes (ending L) differ from new codes (wiki: product_codes_2024)",
+        "Access via warehouse SQL — needs request to Retail Operations"
+      ]
+    },
+    {
+      "source_id": "internal.sales.products",
+      "kind": "internal",
+      "title": "Product list",
+      "location": "azure://valdena-gelato/sales/products",
+      "need_ids": [
+        "N1",
+        "N2"
+      ],
+      "target_windows": [
+        "history",
+        "recent"
+      ],
+      "why_relevant": "Current product codes, names and categories (64 products). Helps decode product_code in sales.daily_by_product for post-2024 period. Provides product names needed to attempt matching old and new codes for N2.",
+      "found_via": "search_internal_catalog 'daily ice cream sales by product Valdena'",
+      "suspected_issues": [
+        "Lists only current codes (post-2024), not historical codes (wiki: product_codes_2024)",
+        "No mapping table exists — matching must be via product name, some names not unique",
+        "Last refreshed 2025-03-31"
+      ]
+    },
+    {
+      "source_id": "api.open_meteo_archive",
+      "kind": "public_api",
+      "title": "Open-Meteo Historical Weather API (ERA5 reanalysis)",
+      "location": "https://archive-api.open-meteo.com/v1/archive",
+      "need_ids": [
+        "N3"
+      ],
+      "target_windows": [
+        "history",
+        "recent"
+      ],
+      "why_relevant": "Daily maximum temperature (temperature_2m_max) from ERA5 reanalysis. Covers full period 2023-06-01 to 2026-03-31. CC-BY-4.0, no API key. Registered and approved for UC2.",
+      "found_via": "list_external_register (api.open_meteo_archive, tagged for UC2)",
+      "suspected_issues": [
+        "ERA5 grid interpolation may differ from ground-station readings",
+        "Must choose specific northern-Italy location — document assumption",
+        "Free tier request limits apply"
+      ]
+    },
+    {
+      "source_id": "api.nager_public_holidays",
+      "kind": "public_api",
+      "title": "Nager.Date public holidays API",
+      "location": "https://date.nager.at/api/v3/PublicHolidays/{year}/{country}",
+      "need_ids": [
+        "N4"
+      ],
+      "target_windows": [
+        "history",
+        "recent"
+      ],
+      "why_relevant": "Italian national public holidays (IT) for 2023-2026. MIT-licensed, no API key. Registered and approved for UC2.",
+      "found_via": "list_external_register (api.nager_public_holidays, tagged for UC2)",
+      "suspected_issues": [
+        "National holidays only — regional/local holidays (patron saint days) not covered",
+        "Need one call per year (year in path)",
+        "Easter and Pasquetta are dynamic — verify each year"
+      ]
+    },
+    {
+      "source_id": "internal.store.calendar",
+      "kind": "internal",
+      "title": "Shop calendar",
+      "location": "azure://valdena-gelato/store/calendar",
+      "need_ids": [
+        "N5"
+      ],
+      "target_windows": [
+        "history",
+        "recent"
+      ],
+      "why_relevant": "Opening days (is_open), closures and local event names per day for the Valdena shop. Daily grain from 2022-01-01 onward. Open to analytics roles.",
+      "found_via": "search_internal_catalog 'Valdena opening days calendar'",
+      "suspected_issues": [
+        "No wiki backlinks — coverage completeness unverified",
+        "event_name may be sparse",
+        "Temporal coverage end is null — confirm extends through 2026-03-31"
+      ]
+    }
+  ],
+  "links": []
+}

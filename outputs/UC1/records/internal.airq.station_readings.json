@@ -1,0 +1,119 @@
+{
+  "source_id": "internal.airq.station_readings",
+  "kind": "internal",
+  "title": "City station readings (hourly)",
+  "location": "azure://valdena-health/env/station_readings",
+  "status": "active",
+  "summary": "Hourly NO2 and PM2.5 readings from Valdena's own urban monitoring stations, starting 2023-01-01 and still updating hourly. Four columns: station_id, ts_utc, no2_ugm3 and pm25_ugm3. Covers ~4.2M rows from the city's fixed monitoring network. Covers the production window (2024-2025) but NOT the prototype window (2004-2005). Station VR-03 (Via Roma) was switched off on 2024-06-30 — readings for that station stop there. Access requires a request to the Environment Monitoring Unit.",
+  "schema": {
+    "documented": "structured",
+    "fields": [
+      {
+        "name": "station_id",
+        "type": "string",
+        "description": "Monitoring station code",
+        "pii": false
+      },
+      {
+        "name": "ts_utc",
+        "type": "timestamp",
+        "description": "Hour start, UTC",
+        "pii": false
+      },
+      {
+        "name": "no2_ugm3",
+        "type": "numeric",
+        "description": "NO2 concentration, micrograms per cubic metre",
+        "pii": false
+      },
+      {
+        "name": "pm25_ugm3",
+        "type": "numeric",
+        "description": "PM2.5 concentration, micrograms per cubic metre",
+        "pii": false
+      }
+    ],
+    "field_count": 4
+  },
+  "temporal": {
+    "start": "2023-01-01",
+    "end": null,
+    "open_ended": true,
+    "grain": "hourly",
+    "refresh_cadence": "hourly",
+    "metadata_last_updated": "2026-10-14"
+  },
+  "spatial": {
+    "coverage": [
+      "IT"
+    ],
+    "code_system": "station_id (free-text codes such as VR-03)",
+    "notes": "Monitoring stations within Valdena municipality, northern Italy. Location per station is not in this table — only station_id codes."
+  },
+  "ownership": {
+    "owner": "Environment Monitoring Unit",
+    "steward": "Giulia Rossi"
+  },
+  "licence": {
+    "name": "internal",
+    "commercial_use": "not_applicable",
+    "evidence": "Catalog entry classification = 'internal' for source internal.airq.station_readings (get_catalog_entry)"
+  },
+  "access": {
+    "method": "warehouse_sql",
+    "auth_required": true,
+    "request_process": "Request to the Environment Monitoring Unit",
+    "reachable": true,
+    "approx_size_bytes": null,
+    "classification": "internal"
+  },
+  "declared_metadata": {
+    "contains_pii": false,
+    "status": "active",
+    "row_count_approx": 4200000
+  },
+  "documentation_excerpts": [
+    "Catalog description: 'Hourly NO2 and PM2.5 readings from the city's own monitoring stations.'",
+    "Wiki page station_network (last edited 2024-07-01): 'Station VR-03 (Via Roma) was switched off on 2024-06-30. Its readings stop there.'",
+    "Wiki page station_network: 'airq.station_readings still lists the network as active. Station VR-03 has no readings after 2024-06-30.'"
+  ],
+  "quality_notes": [
+    "Wiki station_network (2024-07-01) states station VR-03 (Via Roma) was switched off on 2024-06-30 and has no readings after that date. The catalog entry still lists the network as active without caveat — this is a catalog vs wiki discrepancy.",
+    "No PM10 or O3 available — only NO2 and PM2.5.",
+    "Temporal coverage starts 2023-01-01, does NOT cover the prototype window (2004-2005).",
+    "Approx 4.2M rows suggests about ~480 rows per hour over ~3.8 years for the full network. Exact number of stations is not documented in the catalog entry."
+  ],
+  "provenance": [
+    {
+      "claim": "Source is internal, classified as internal data, with licence = internal",
+      "evidence": "get_catalog_entry(entry_id='airq.station_readings') — classification field"
+    },
+    {
+      "claim": "Table has 4 columns: station_id, ts_utc, no2_ugm3, pm25_ugm3",
+      "evidence": "get_catalog_entry(entry_id='airq.station_readings') — columns array"
+    },
+    {
+      "claim": "Station VR-03 was switched off on 2024-06-30 and has no readings after that; catalog still lists it as active",
+      "evidence": "read_wiki_page(page_id='station_network') — body text, last_edited=2024-07-01"
+    },
+    {
+      "claim": "Temporal coverage starts 2023-01-01 and is open-ended (still updating hourly)",
+      "evidence": "get_catalog_entry(entry_id='airq.station_readings') — temporal_coverage.start, temporal_coverage.end, refresh_cadence"
+    },
+    {
+      "claim": "Owner is Environment Monitoring Unit, steward is Giulia Rossi",
+      "evidence": "get_catalog_entry(entry_id='airq.station_readings') — owner, steward fields"
+    },
+    {
+      "claim": "Access requires a request to the Environment Monitoring Unit",
+      "evidence": "get_catalog_entry(entry_id='airq.station_readings') — access.request_process"
+    }
+  ],
+  "unknowns": [
+    "Exact number of monitoring stations in the network",
+    "Geographic coordinates per station (not in this table)",
+    "Whether a data-sharing agreement is already in place or needs to be newly requested with the Environment Monitoring Unit",
+    "Data quality flags or missing-value handling (not documented)",
+    "Station VR-03 replacement or whether its readings have been redistributed to other stations"
+  ]
+}

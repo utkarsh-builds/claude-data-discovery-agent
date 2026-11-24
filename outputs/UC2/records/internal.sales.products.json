@@ -1,0 +1,119 @@
+{
+  "source_id": "internal.sales.products",
+  "kind": "internal",
+  "title": "Product list",
+  "location": "azure://valdena-gelato/sales/products",
+  "status": "active",
+  "summary": "Current product codes, names and categories for Valdena Gelato Shop. Contains 64 products covering the post-2024 code system. This is a static reference table that lists only current (post-2024) codes — codes ending in 'L' that were used before 2024-04-01 are not present. The table is refreshed on change and was last updated on 2025-03-31. It serves as the key to decode product_code in sales.daily_by_product for the period after 2024-04-01, but cannot directly map pre-2024 codes because no mapping table exists.",
+  "schema": {
+    "documented": "structured",
+    "fields": [
+      {
+        "name": "product_code",
+        "type": "string",
+        "description": "Current product code (post-2024 format)",
+        "pii": false
+      },
+      {
+        "name": "product_name",
+        "type": "string",
+        "description": "Product name",
+        "pii": false
+      },
+      {
+        "name": "category",
+        "type": "string",
+        "description": "Product category",
+        "pii": false
+      }
+    ],
+    "field_count": 3
+  },
+  "temporal": {
+    "start": null,
+    "end": null,
+    "open_ended": true,
+    "grain": "static",
+    "refresh_cadence": "on change",
+    "metadata_last_updated": "2025-03-31"
+  },
+  "spatial": {
+    "coverage": [
+      "IT"
+    ],
+    "code_system": null,
+    "notes": "The Valdena Gelato Shop is a single shop in northern Italy; no geographic codes appear in this table."
+  },
+  "ownership": {
+    "owner": "Retail Operations",
+    "steward": "Marco Bianchi",
+    "publisher": null
+  },
+  "licence": {
+    "name": "internal",
+    "url": null,
+    "commercial_use": "not_applicable",
+    "mixed_sources": false,
+    "attribution_text": null,
+    "agreement_status": null,
+    "evidence": "get_catalog_entry('internal.sales.products'): classification='internal'"
+  },
+  "access": {
+    "method": "warehouse_sql",
+    "auth_required": true,
+    "request_process": "Open to analytics roles",
+    "reachable": true,
+    "approx_size_bytes": null,
+    "classification": "internal"
+  },
+  "declared_metadata": {
+    "contains_pii": false,
+    "row_count_approx": 64
+  },
+  "documentation_excerpts": [
+    "From catalog: 'Current product codes, names and categories.'",
+    "From wiki page 'product_codes_2024' (last edited 2024-04-02): 'From 2024-04-01, product codes changed. Codes ending in \"L\" were replaced by new codes.'",
+    "From wiki page 'product_codes_2024': 'sales.products lists only the current codes.'"
+  ],
+  "quality_notes": [
+    "No mapping table exists between old (pre-2024) and new (post-2024) product codes. Old codes ending in 'L' cannot be decoded via this table.",
+    "Matching old and new codes must be attempted via product name, but the wiki warns that some names are not unique.",
+    "This table was last refreshed on 2025-03-31. It may not reflect product changes after that date.",
+    "The catalog description says 'Current product codes, names and categories' — the wiki (product_codes_2024, last edited 2024-04-02) is more specific: it confirms only current (post-2024) codes are listed.",
+    "The related table sales.daily_by_product (wiki: till_migration_2024) has no rows between 2024-02-05 and 2024-03-10 due to till system replacement."
+  ],
+  "provenance": [
+    {
+      "claim": "Table contains 64 rows, 3 columns: product_code, product_name, category.",
+      "evidence": "get_catalog_entry('internal.sales.products'): row_count_approx=64, columns"
+    },
+    {
+      "claim": "Only current (post-2024) product codes are listed; codes ending in 'L' are absent.",
+      "evidence": "read_wiki_page('product_codes_2024'): 'From 2024-04-01, product codes changed... sales.products lists only the current codes.'"
+    },
+    {
+      "claim": "No mapping table exists between old and new codes; matching must be via product name, and some names are not unique.",
+      "evidence": "read_wiki_page('product_codes_2024'): 'No mapping table exists... some names are not unique.'"
+    },
+    {
+      "claim": "Owner is Retail Operations, steward is Marco Bianchi.",
+      "evidence": "get_catalog_entry('internal.sales.products'): owner='Retail Operations', steward='Marco Bianchi'"
+    },
+    {
+      "claim": "Last refreshed on 2025-03-31.",
+      "evidence": "get_catalog_entry('internal.sales.products'): last_refreshed='2025-03-31'"
+    },
+    {
+      "claim": "Classification is internal.",
+      "evidence": "get_catalog_entry('internal.sales.products'): classification='internal'"
+    }
+  ],
+  "unknowns": [
+    "Exact date when this product list was first created (no created_at in catalog).",
+    "Whether any renames or removals happened between 2024-04-01 and 2025-03-31 that are not captured.",
+    "Whether the shop has changed any product codes since 2025-03-31 (last refresh date).",
+    "Which specific product names are non-unique (wiki mentions some but does not list them)."
+  ],
+  "canonical_ref": null,
+  "sample_findings": []
+}

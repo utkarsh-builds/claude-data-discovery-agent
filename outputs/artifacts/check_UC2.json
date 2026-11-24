@@ -1,0 +1,19 @@
+{
+  "use_case": "UC2",
+  "problems": [
+    "signoff.json: field red_flag_details is not in the record for internal.sales.daily_by_product"
+  ],
+  "trace_stats": {
+    "llm_calls": 53,
+    "input_tokens": 242745,
+    "output_tokens": 48801,
+    "tool_calls": 75,
+    "tool_errors": 7,
+    "http_live": 11,
+    "http_refused": 1,
+    "refused_hosts": [
+      "date.nager.at"
+    ],
+    "unreachable_links": []
+  }
+}

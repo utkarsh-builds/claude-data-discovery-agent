@@ -1,0 +1,137 @@
+{
+  "source_id": "api.nager_public_holidays",
+  "kind": "public_api",
+  "title": "Nager.Date public holidays API",
+  "location": "https://date.nager.at/api/v3/PublicHolidays/{year}/{country}",
+  "status": "active",
+  "summary": "Public holidays for Italy (ISO 3166-1 alpha-2 code IT), returned as a JSON array with date, name in English and local language, and flags per holiday (global vs regional, types such as 'Public'). Data is available for all years at least back to 2003 (probed) and into the future. All Italian national public holidays are marked as 'global: true', meaning they apply nationwide. No regional/local holidays specific to Valdena municipality are present (counties field is always null for Italy). Serves as a supplementary dataset for interpreting low clinic-visit counts on holidays/weekends in the production window.",
+  "schema": {
+    "documented": "structured",
+    "fields": [
+      {
+        "name": "date",
+        "type": "string",
+        "description": "Date of the holiday in YYYY-MM-DD format"
+      },
+      {
+        "name": "localName",
+        "type": "string",
+        "description": "Holiday name in the local language (Italian)"
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "description": "Holiday name in English"
+      },
+      {
+        "name": "countryCode",
+        "type": "string",
+        "description": "ISO 3166-1 alpha-2 country code"
+      },
+      {
+        "name": "fixed",
+        "type": "boolean",
+        "description": "Whether the holiday date is fixed on the calendar"
+      },
+      {
+        "name": "global",
+        "type": "boolean",
+        "description": "Whether the holiday applies everywhere in the country"
+      },
+      {
+        "name": "counties",
+        "type": "null",
+        "description": "List of counties if regional; null for national holidays"
+      },
+      {
+        "name": "launchYear",
+        "type": "null",
+        "description": "First year the holiday was observed; null if not specified"
+      },
+      {
+        "name": "types",
+        "type": "array",
+        "description": "Array of holiday types, e.g. ['Public']"
+      }
+    ],
+    "field_count": 9
+  },
+  "temporal": {
+    "start": "2004-03-10",
+    "end": null,
+    "grain": "daily",
+    "refresh_cadence": "on_demand",
+    "metadata_last_updated": "2026-11-12",
+    "open_ended": true
+  },
+  "spatial": {
+    "coverage": [
+      "IT"
+    ],
+    "code_system": "ISO 3166-1 alpha-2",
+    "notes": "Returns data for any country code. For Italy, all returned holidays have global=true, meaning national holidays. No Valdena-specific local holidays are represented."
+  },
+  "ownership": {
+    "owner": "Nager (nager.at)",
+    "steward": null,
+    "publisher": null
+  },
+  "licence": {
+    "name": "MIT",
+    "url": "https://raw.githubusercontent.com/nager/Nager.Date/main/LICENSE",
+    "commercial_use": "yes",
+    "mixed_sources": false,
+    "attribution_text": null,
+    "agreement_status": "not_required_open_data",
+    "evidence": "LICENSE file at main GitHub repo: https://raw.githubusercontent.com/nager/Nager.Date/main/LICENSE — MIT License, copyright (c) 2016 nager.at"
+  },
+  "access": {
+    "method": "rest_api",
+    "auth_required": false,
+    "reachable": true,
+    "approx_size_bytes": 2307,
+    "classification": "public_open_data"
+  },
+  "declared_metadata": {
+    "has_missing_values": "not_applicable",
+    "contains_pii": false
+  },
+  "documentation_excerpts": [
+    "MIT License — Copyright (c) 2016 nager.at — Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files ...",
+    "All Italian holidays returned in the probe are 'global: true', meaning nationwide. No regional/local holidays for Valdena area are listed."
+  ],
+  "quality_notes": [
+    "Does not include local/regional holidays specific to Valdena municipality (counties field is always null for Italy probes). Only national IT holidays are provided.",
+    "Supplementary source: helps identify public holidays to interpret zero/low clinic visit counts on those days but does not directly provide clinic data.",
+    "Fixity: Easter Sunday (Pasqua) is correctly a movable holiday (fixed: false). All other Italian holidays are fixed: false too — this appears to be a schema characteristic where fixed indicates whether the date calculation is algorithm-based, not whether it's on the same date each year."
+  ],
+  "provenance": [
+    {
+      "claim": "API returns 13 national Italian public holidays for each year probed (2003, 2004, 2024, 2025)",
+      "evidence": "call_public_api('api.nager_public_holidays', path_params={'year':'2024','country':'IT'}) — 13 items returned"
+    },
+    {
+      "claim": "Licence is MIT, allowing commercial use",
+      "evidence": "probe_url('https://raw.githubusercontent.com/nager/Nager.Date/main/LICENSE') — MIT license text confirmed"
+    },
+    {
+      "claim": "API is registered as not_required_open_data, approved for prototyping and production",
+      "evidence": "list_external_register() — source api.nager_public_holidays with agreement_status='not_required_open_data', approved_purposes=['prototyping','production']"
+    },
+    {
+      "claim": "Holidays are marked as global=true (nationwide) for Italy, no regional subdivisions",
+      "evidence": "call_public_api probes — every IT holiday has 'global': true, 'counties': null"
+    },
+    {
+      "claim": "API is active and reachable at date.nager.at without authentication",
+      "evidence": "call_public_api('api.nager_public_holidays', path_params={'year':'2024','country':'IT'}) — HTTP 200"
+    }
+  ],
+  "unknowns": [
+    "Whether the API covers municipal/local holidays specific to Valdena (counties field for IT is always null, suggesting local holidays are not listed)",
+    "Launch year for each Italian holiday — launchYear is always null in responses",
+    "Update cadence of the underlying holiday data (the API data is on-demand, but when the source database is refreshed is not stated)"
+  ],
+  "canonical_ref": "null",
+  "sample_findings": []
+}
