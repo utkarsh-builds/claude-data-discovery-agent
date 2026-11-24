@@ -1,0 +1,28 @@
+{
+  "reviewer": "Data Scientist",
+  "verdict": "proceed_with_conditions",
+  "conditions": [
+    {
+      "text": "Obtain data-sharing access approval for internal air quality and traffic tables.",
+      "owner": "Environment Monitoring Unit / Mobility Office",
+      "due": "2026-11-25"
+    },
+    {
+      "text": "Legal must resolve the UCI 360 CC-BY vs Research-Only license contradiction.",
+      "owner": "Legal Team",
+      "due": "2026-11-25"
+    }
+  ],
+  "agreements": [
+    {
+      "source_id": "internal.clinic.patient_visits",
+      "reason": "Agree with rejecting this source due to explicit wiki policy prohibition for this analysis purpose."
+    }
+  ],
+  "overrides": [],
+  "traced_conclusion": {
+    "source_id": "internal.traffic.hourly_counts",
+    "record_field": "red_flag_details",
+    "could_change_if": "The Mobility Office confirms they already applied an automated scaling factor to historical warehouse data."
+  }
+}

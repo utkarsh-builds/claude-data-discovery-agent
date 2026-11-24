@@ -1,0 +1,120 @@
+{
+  "source_id": "api.open_meteo_archive",
+  "kind": "public_api",
+  "title": "Open-Meteo Historical Weather API (reanalysis)",
+  "location": "https://archive-api.open-meteo.com/v1/archive",
+  "status": "active",
+  "summary": "Open-Meteo Historical Weather API provides gap-free hourly reanalysis weather data from ERA5 (0.25°, from 1940), ERA5-Land (0.1°, from 1950) and ECMWF IFS (9 km, from 2017). For the Milan area (45.4642°N, 9.19°E), it returns hourly temperature_2m (°C) and relative_humidity_2m (%) among many other variables. Both target windows (prototype 2004-03-10 to 2005-04-04 and production 2024-01-01 to 2025-12-31) are fully covered. The API is open-data under CC BY 4.0, requires no authentication, and is registered and approved for both prototyping and production use.",
+  "schema": {
+    "documented": "structured",
+    "field_count": 3,
+    "fields": [
+      {
+        "name": "time",
+        "type": "datetime",
+        "unit": "iso8601",
+        "description": "Hourly timestamp in ISO8601 format (YYYY-MM-DDTHH:MM)"
+      },
+      {
+        "name": "temperature_2m",
+        "type": "float",
+        "unit": "°C",
+        "description": "Temperature at 2 metres above ground"
+      },
+      {
+        "name": "relative_humidity_2m",
+        "type": "float",
+        "unit": "%",
+        "description": "Relative humidity at 2 metres above ground"
+      }
+    ],
+    "notes": "The API returns nearest ERA5-Land grid cell for the given coordinates (response showed 45.448154°N, 9.169279°E for Milan 45.4642°N, 9.1900°E). Many more hourly variables available: dewpoint, apparent_temperature, precipitation, rain, snowfall, pressure, cloud cover, wind, etc. All variables are documented at https://open-meteo.com/en/docs/historical-weather-api"
+  },
+  "temporal": {
+    "start": "1940-01-01",
+    "end": null,
+    "open_ended": true,
+    "grain": "hourly",
+    "refresh_cadence": "static (reanalysis data; historical archive updated periodically but not on a live schedule)",
+    "metadata_last_updated": null
+  },
+  "spatial": {
+    "coverage": [
+      "IT"
+    ],
+    "code_system": "decimal degrees (WGS84 latitude/longitude)",
+    "notes": "API accepts any lat/lon globally; returns nearest grid cell. For Milan area (45.4642, 9.1900), the actual cell returned is (45.448154, 9.169279). ERA5-Land resolution is ~0.1° (~9 km). Temperature and humidity at a single point therefore represent the grid-cell average, not a local station reading."
+  },
+  "ownership": {
+    "owner": "Open-Meteo (Zippenfenig, P.)",
+    "steward": null,
+    "publisher": "Open-Meteo"
+  },
+  "licence": {
+    "name": "CC BY 4.0",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "commercial_use": "yes",
+    "mixed_sources": true,
+    "attribution_text": "Attribution required: any location where Open-Meteo data are displayed must include a link such as <a href='https://open-meteo.com/'>Weather data by Open-Meteo.com</a>",
+    "agreement_status": "not_required_open_data",
+    "evidence": "https://open-meteo.com/en/licence — states 'API data are offered under Attribution 4.0 International (CC BY 4.0)'. Open-Meteo's upstream data sources (DWD, ECMWF, NOAA, CMC, MeteoFrance, JMA, etc.) have their own licences (mostly CC-BY, some CC-BY-SA, some other open licences), making this a mixed-source work."
+  },
+  "access": {
+    "method": "rest_api",
+    "auth_required": false,
+    "request_process": null,
+    "reachable": true,
+    "approx_size_bytes": null,
+    "classification": "public_open_data"
+  },
+  "declared_metadata": {
+    "variables": "temperature_2m and relative_humidity_2m confirmed via probe",
+    "model": "ERA5-Land (0.1° resolution) for pre-2017 data; ECMWF IFS (9 km) from 2017",
+    "elevation": "147.0 m at Milan grid cell",
+    "timezone": "GMT/UTC (configurable)"
+  },
+  "documentation_excerpts": [
+    "Gap-free and consistent historical weather data using weather reanalysis from ERA5 (0.25°, from 1940) and ERA5-Land (0.1°, from 1950) and ECMWF IFS (9 km, from 2017) — https://open-meteo.com/en/docs/historical-weather-api",
+    "API data are offered under Attribution 4.0 International (CC BY 4.0) — https://open-meteo.com/en/licence",
+    "Open-Meteo utilises open-data from various national weather services including: ... Weather reanalysis, air quality forecasts and elevation data from Copernicus Climate Change Service C3S (Licence) — https://open-meteo.com/en/licence"
+  ],
+  "quality_notes": [
+    "ERA5/ERA5-Land reanalysis data are model-derived, not station observations — temperature and humidity at a point are grid-cell averages (~9 km resolution). Local microclimatic effects (e.g. urban heat island, valley inversions) are not captured at full fidelity.",
+    "API response showed elevation 147.0 m at Milan coordinates; actual elevation in central Milan is ~120 m — small discrepancy from grid averaging.",
+    "The API automatically selects the best available model per date range: ERA5-Land for 1950-2016, ECMWF IFS for 2017-present. This means different model resolutions apply across the two windows (prototype 2004-2005 uses ERA5-Land at ~9 km; production 2024-2025 uses ECMWF IFS at ~9 km).",
+    "Upstream data sources have diverse licences (CC-BY, CC-BY-SA, other open licences) — see mixed_sources = true.",
+    "Register default coordinates were already set to Milan (45.4642, 9.1900) — the suspected issue about Lisbon coordinates is resolved."
+  ],
+  "provenance": [
+    {
+      "claim": "API is registered and approved for prototyping and production use",
+      "evidence": "list_external_register() → api.open_meteo_archive agreement_status='not_required_open_data', approved_purposes=['prototyping', 'production']"
+    },
+    {
+      "claim": "Hourly temperature_2m (°C) and relative_humidity_2m (%) are available",
+      "evidence": "call_public_api(source_id='api.open_meteo_archive', query for 2024-01-01 to 2024-01-03) returned hourly time, temperature_2m, relative_humidity_2m"
+    },
+    {
+      "claim": "Both target time windows are covered by the data (1940-present)",
+      "evidence": "call_public_api(source_id='api.open_meteo_archive', query for 2004-03-10 to 2004-03-12) returned data successfully for prototype window"
+    },
+    {
+      "claim": "Licence is CC BY 4.0, commercial use allowed",
+      "evidence": "probe_url('https://open-meteo.com/en/licence') — page states 'API data are offered under Attribution 4.0 International (CC BY 4.0)'"
+    },
+    {
+      "claim": "Data source is ERA5-Land reanalysis for the prototype window, ECMWF IFS for production",
+      "evidence": "probe_url('https://open-meteo.com/en/docs/historical-weather-api') — docs state ERA5-Land (0.1°, from 1950) and ECMWF IFS (9 km, from 2017)"
+    },
+    {
+      "claim": "Milan coordinates are the register default (45.4642, 9.1900)",
+      "evidence": "list_external_register() → api.open_meteo_archive default_query includes latitude=45.4642, longitude=9.1900"
+    }
+  ],
+  "unknowns": [
+    "Exact refresh cadence for the historical archive is not documented (static reanalysis, but updates may add recent data periodically)",
+    "Metadata last-updated date for the API documentation is not stated explicitly",
+    "Rate limits for multi-year queries are not documented on the licence or docs pages probed",
+    "Which specific ERA5-Land model version is used for the 2004-2005 period is not declared"
+  ]
+}

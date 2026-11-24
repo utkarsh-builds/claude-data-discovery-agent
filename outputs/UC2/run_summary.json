@@ -1,0 +1,20 @@
+{
+  "use_case": "UC2",
+  "model": "DeepSeek-V4-Flash",
+  "stages": {
+    "plan": 101.7,
+    "scout": 316.9
+  },
+  "totals": {
+    "llm_calls": 11,
+    "input_tokens": 69174,
+    "output_tokens": 9716,
+    "cache_read_input_tokens": 34304,
+    "tool_calls": 27,
+    "tool_errors": 0,
+    "http_requests": 0,
+    "http_refused": 0
+  },
+  "warnings": [],
+  "finished_at": "2026-11-19T09:19:04Z"
+}

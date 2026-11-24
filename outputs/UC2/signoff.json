@@ -1,0 +1,28 @@
+{
+  "reviewer": "Data Scientist",
+  "verdict": "proceed_with_conditions",
+  "conditions": [
+    {
+      "text": "Purchase commercial Open-Meteo subscription for weather data access.",
+      "owner": "Project Lead",
+      "due": "2026-11-25"
+    },
+    {
+      "text": "Map old/new product codes via product name and handle the 34-day till migration gap.",
+      "owner": "Data Analyst",
+      "due": "2026-11-25"
+    }
+  ],
+  "agreements": [
+    {
+      "source_id": "api.open_meteo_archive",
+      "reason": "Agree that a commercial entity requires a paid Open-Meteo subscription due to free-tier non-commercial limitations."
+    }
+  ],
+  "overrides": [],
+  "traced_conclusion": {
+    "source_id": "internal.sales.daily_by_product",
+    "record_field": "red_flag_details",
+    "could_change_if": "The shop owner locates paper backup logs for the till migration period that can be digitized."
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "source_id": "internal.clinic.resp_visits_daily",
+  "kind": "internal",
+  "title": "Respiratory visits (daily, by district)",
+  "location": "azure://valdena-health/clinic/resp_visits_daily",
+  "status": "active",
+  "summary": "Daily count of respiratory clinic visits aggregated by district in Valdena (northern Italy), from 2022-01-01 onwards. The table contains no patient identifiers \\u2014 only visit_date, district and visit_count. It is refreshed daily and was last refreshed on 2026-10-14. Per the clinic data policy for surveillance (last edited 2025-02-01), this is the only clinic visits table permitted for this analysis; patient-level records and age/postcode fields are explicitly prohibited. Covers the full production window (2024-01-01 to 2025-12-31).",
+  "schema": {
+    "documented": "structured",
+    "fields": [
+      {
+        "name": "visit_date",
+        "type": "date",
+        "unit": null,
+        "description": "Day of the visits",
+        "pii": false
+      },
+      {
+        "name": "district",
+        "type": "string",
+        "unit": null,
+        "description": "District of residence",
+        "pii": false
+      },
+      {
+        "name": "visit_count",
+        "type": "integer",
+        "unit": "visits",
+        "description": "Respiratory visits that day",
+        "pii": false
+      }
+    ],
+    "field_count": 3,
+    "notes": "Simple schema: one row per district per day."
+  },
+  "temporal": {
+    "start": "2022-01-01",
+    "end": null,
+    "open_ended": true,
+    "grain": "daily",
+    "refresh_cadence": "daily",
+    "metadata_last_updated": "2026-10-14"
+  },
+  "spatial": {
+    "coverage": [
+      "IT"
+    ],
+    "code_system": "free-text district names (Valdena districts)",
+    "notes": "District boundaries may have changed during the production window — the catalog does not document which version of district boundaries is used. This could affect join consistency with other sources using district codes."
+  },
+  "ownership": {
+    "owner": "Clinical Analytics",
+    "steward": "Chiara Conti",
+    "publisher": null
+  },
+  "licence": {
+    "name": "internal",
+    "url": null,
+    "commercial_use": "not_applicable",
+    "mixed_sources": false,
+    "attribution_text": null,
+    "agreement_status": null,
+    "evidence": "get_catalog_entry internal.clinic.resp_visits_daily: licence.name = 'internal' (by convention for internal sources); clinic_data_policy wiki page confirms explicit data-use permission for this table only."
+  },
+  "access": {
+    "method": "warehouse_sql",
+    "auth_required": null,
+    "request_process": "Request to Clinical Analytics",
+    "reachable": true,
+    "approx_size_bytes": null,
+    "classification": "internal"
+  },
+  "declared_metadata": {
+    "contains_pii": false,
+    "row_count_approx": 40000,
+    "status": "active",
+    "last_refreshed": "2026-10-14"
+  },
+  "documentation_excerpts": [
+    "(catalog) \"Respiratory clinic visits counted per day and per district. Contains no patient identifiers.\"",
+    "(catalog) grain: daily, refresh cadence: daily",
+    "(wiki clinic_data_policy, 2025-02-01) \"Only daily counts by district (clinic.resp_visits_daily) may be used for this purpose.\"",
+    "(wiki) \"Patient-level visit records (clinic.patient_visits) may not be used for this analysis.\"",
+    "(wiki) \"Patient postcode and age band are personal data. They must not leave the clinic systems for analysis.\""
+  ],
+  "quality_notes": [
+    "District boundaries may have changed during the production window — undocumented in catalog; would need clarification from the steward.",
+    "Weekend/holiday effects may produce zero visit_count values that look like missing data — no sentinel values documented.",
+    "Respiratory coding consistency across clinics is undocumented; different clinics may use different diagnosis-code ranges for 'respiratory'.",
+    "Table holds ~40k rows across ~3 years and ~? districts; expected density unknown.",
+    "The wiki clinic_data_policy (2025-02-01) is the authoritative governance document for this analysis, superseding any earlier permissions."
+  ],
+  "provenance": [
+    {
+      "claim": "Table contains visit_date, district and visit_count, no PII",
+      "evidence": "get_catalog_entry internal.clinic.resp_visits_daily: columns described"
+    },
+    {
+      "claim": "Temporal coverage starts 2022-01-01 and is open-ended (still updating), refreshed daily",
+      "evidence": "get_catalog_entry internal.clinic.resp_visits_daily: temporal_coverage.start=2022-01-01, end=null, refresh_cadence=daily"
+    },
+    {
+      "claim": "Owner is Clinical Analytics, steward is Chiara Conti",
+      "evidence": "get_catalog_entry internal.clinic.resp_visits_daily: owner='Clinical Analytics', steward='Chiara Conti'"
+    },
+    {
+      "claim": "Only this aggregated table may be used; patient-level records are prohibited",
+      "evidence": "read_wiki_page clinic_data_policy (2025-02-01): explicit permission"
+    },
+    {
+      "claim": "Approximate row count is 40,000",
+      "evidence": "get_catalog_entry internal.clinic.resp_visits_daily: row_count_approx=40000"
+    },
+    {
+      "claim": "Table status is active, last refreshed 2026-10-14",
+      "evidence": "get_catalog_entry internal.clinic.resp_visits_daily: status='active', last_refreshed='2026-10-14'"
+    }
+  ],
+  "unknowns": [
+    "How district boundaries are defined (version / GIS revision) — undocumented.",
+    "Which specific diagnosis codes are counted as 'respiratory' — not documented in catalog or wiki.",
+    "Whether zero visit_count means no visits or a weekend/holiday closure — no sentinel values documented.",
+    "Number of districts covered — not stated.",
+    "How far back historical data is available before 2022-01-01 — start is 2022-01-01."
+  ]
+}

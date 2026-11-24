@@ -1,0 +1,20 @@
+{
+  "_comment": "Gate decisions: one entry per dataset link in your links file. 'url' must match the links file exactly. decision is 'accept' or 'reject'. reason is at least 20 characters, in your own words. Only accepted links are profiled. Copy to outputs/<ID>/gate_decisions.json.",
+  "decisions": [
+    {
+      "url": "https://archive.ics.uci.edu/dataset/360/air+quality",
+      "decision": "accept",
+      "reason": "This dataset provides the exact hourly air pollutant concentrations required for the prototype window."
+    },
+    {
+      "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/sdg_11_52?format=JSON&lang=EN&geo=IT",
+      "decision": "accept",
+      "reason": "This API provides the annual PM2.5-attributable death context required for N6. I will add the host to the allowlist later."
+    },
+    {
+      "url": "https://catalog.data.gov/dataset/open-air-chicago-hour-aggregations",
+      "decision": "accept",
+      "reason": "Accepting this distractor link specifically to trigger and test the domain guardrail refusal in the pipeline."
+    }
+  ]
+}

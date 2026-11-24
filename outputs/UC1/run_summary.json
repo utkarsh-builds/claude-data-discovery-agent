@@ -1,0 +1,19 @@
+{
+  "use_case": "UC1",
+  "model": "DeepSeek-V4-Flash",
+  "stages": {
+    "profile": 129.7
+  },
+  "totals": {
+    "llm_calls": 2,
+    "input_tokens": 10814,
+    "output_tokens": 1068,
+    "cache_read_input_tokens": 0,
+    "tool_calls": 1,
+    "tool_errors": 1,
+    "http_requests": 0,
+    "http_refused": 1
+  },
+  "warnings": [],
+  "finished_at": "2026-11-19T08:04:11Z"
+}

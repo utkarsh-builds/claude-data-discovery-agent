@@ -1,0 +1,138 @@
+{
+  "candidates": [
+    {
+      "source_id": "internal.sales.daily_by_product",
+      "kind": "internal",
+      "title": "Daily sales by product",
+      "location": "azure://valdena-gelato/sales/daily_by_product",
+      "need_ids": [
+        "N1"
+      ],
+      "target_windows": [
+        "history",
+        "recent"
+      ],
+      "why_relevant": "Daily grain sales data (units_sold, revenue_eur) by product_code covering 2022-01-01 to present. Directly serves N1 for both windows.",
+      "found_via": "search_internal_catalog(Valdena daily sales by product)",
+      "suspected_issues": [
+        "Gap 2024-02-05 to 2024-03-10 due to till replacement (wiki: till_migration_2024)",
+        "Product codes changed 2024-04-01 (codes ending in L replaced)",
+        "No mapping table exists for old to new product codes (wiki: product_codes_2024)"
+      ],
+      "canonical_ref": "sales.daily_by_product"
+    },
+    {
+      "source_id": "internal.sales.products",
+      "kind": "internal",
+      "title": "Product list (current codes)",
+      "location": "azure://valdena-gelato/sales/products",
+      "need_ids": [
+        "N1",
+        "N2"
+      ],
+      "target_windows": [
+        "history",
+        "recent"
+      ],
+      "why_relevant": "Current product codes with names and categories (64 products). Helps decode product_code in sales and could partially help N2 via product name matching.",
+      "found_via": "search_internal_catalog(Valdena daily sales by product)",
+      "suspected_issues": [
+        "Lists only current (post-2024) codes, not historical ones",
+        "Some product names are not unique - matching by name may be unreliable (wiki: product_codes_2024)"
+      ],
+      "canonical_ref": "sales.products"
+    },
+    {
+      "source_id": "internal.store.calendar",
+      "kind": "internal",
+      "title": "Shop calendar (opening days, closures, local events)",
+      "location": "azure://valdena-gelato/store/calendar",
+      "need_ids": [
+        "N5"
+      ],
+      "target_windows": [
+        "history",
+        "recent"
+      ],
+      "why_relevant": "Daily calendar with is_open (boolean) and event_name (local events). Directly serves N5 for both windows. Covers 2022-01-01 to present.",
+      "found_via": "search_internal_catalog(gelato shop POS daily transactions)",
+      "suspected_issues": [
+        "No wiki backlinks found - documentation status unknown",
+        "Event descriptions may not cover all local events that affect foot traffic",
+        "Does not capture reduced hours vs fully open distinction"
+      ],
+      "canonical_ref": "store.calendar"
+    },
+    {
+      "source_id": "api.open_meteo_archive",
+      "kind": "public_api",
+      "title": "Open-Meteo Historical Weather API",
+      "location": "https://archive-api.open-meteo.com/v1/archive",
+      "need_ids": [
+        "N3"
+      ],
+      "target_windows": [
+        "history",
+        "recent"
+      ],
+      "why_relevant": "Public API for historical daily temperature data. Can request daily maximum temperature for any coordinates. Registered for UC2, approved for prototyping and production.",
+      "found_via": "list_external_register()",
+      "suspected_issues": [
+        "Coordinates not confirmed - Milan (45.4642, 9.1900) is plausible but assumed",
+        "Must request daily aggregation explicitly",
+        "Data lag may mean most recent days unavailable",
+        "ERA5 grid cell may not match local microclimate"
+      ],
+      "canonical_ref": null
+    },
+    {
+      "source_id": "api.nager_public_holidays",
+      "kind": "public_api",
+      "title": "Nager.Date public holidays API",
+      "location": "https://date.nager.at/api/v3/PublicHolidays/{year}/{country}",
+      "need_ids": [
+        "N4"
+      ],
+      "target_windows": [
+        "history",
+        "recent"
+      ],
+      "why_relevant": "Public API for Italian national public holidays. Returns date and name per holiday. Registered for UC2, approved for prototyping and production. MIT-licensed.",
+      "found_via": "list_external_register()",
+      "suspected_issues": [
+        "Only covers national holidays - regional/local holidays not included",
+        "Check API convention for holidays falling on weekends",
+        "May not match shop definition of holiday"
+      ],
+      "canonical_ref": null
+    }
+  ],
+  "searches_run": [
+    "search_internal_catalog(Valdena daily sales by product)",
+    "search_internal_catalog(gelato shop POS daily transactions)",
+    "search_internal_catalog(ice cream sales 2023 2024 2025)",
+    "search_internal_catalog(Valdena revenue by flavour day)",
+    "search_internal_catalog(shop daily sales report product-level)",
+    "search_internal_catalog(N1 sales data UC2 valdena)",
+    "search_internal_catalog(product code mapping 2024 change)",
+    "search_internal_catalog(Valdena product SKU migration 2024)",
+    "search_internal_catalog(old new product codes ice cream)",
+    "search_internal_catalog(item code crosswalk gelato)",
+    "search_internal_catalog(Valdena opening hours calendar)",
+    "search_internal_catalog(shop holiday schedule valdena)",
+    "search_internal_catalog(Valdena local weather data)",
+    "search_internal_catalog(Italy public holidays calendar)",
+    "search_internal_catalog(local events near gelato shop)",
+    "search_internal_catalog(shop operating days calendar)",
+    "search_internal_catalog(town festivals valdena region)",
+    "search_internal_catalog(product name mapping old codes 2023 2024 gelato)",
+    "search_internal_catalog(historical product codes valdena)",
+    "list_external_register()"
+  ],
+  "unmet_needs": [
+    "N2 (Product code mapping): The wiki page product_codes_2024 explicitly states: No mapping table exists between old and new codes. Codes changed 2024-04-01 (codes ending in L replaced). Matching can only be done by product name, but some names are not unique. No internal or register source provides a mapping. Critical gap.",
+    "N4 (Public holidays - regional/local): Nager.Date only covers national holidays. No internal or register source found for regional/local Italian holidays. The store.calendar event_name may partially cover this but not systematically.",
+    "N5 (Local events completeness): store.calendar has event_name but no wiki documentation on coverage methodology. Events from 2023 may be less complete than recent ones."
+  ],
+  "rejected_without_profiling": []
+}

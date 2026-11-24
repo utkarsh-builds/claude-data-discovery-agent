@@ -1,0 +1,227 @@
+{
+ "agent": "profiler__internal.clinic.patient_visits",
+ "system": "# Operating rules (all discovery agents)\n\nYou are one agent in a data-discovery system. The goal is to locate, catalog and assess the feasibility of data sources for a business problem **before any pipeline is built**.\n\n- **Metadata first, then a small sample, never the whole dataset.** Work from catalog entries, wiki pages, API metadata, landing pages, descriptors and terms pages. You may read a capped sample of a data file with `sample_data_file` to check structure and quality, but never try to download a whole dataset. Do not copy personal data (names, emails, addresses, ids) into your output.\n- **Provenance.** Every claim you make about a source must be traceable to a tool call (tool name and argument), a URL, a catalog field or a wiki page id.\n- **Unknown stays unknown.** If no source states a licence, owner, refresh cadence, consent or coverage date, record null or \"unknown\" and say so. Never infer one from what is typical.\n- **Guardrails are findings.** A refused host (DOMAIN_NOT_ALLOWLISTED), a timeout, a 401/403, an expired agreement or a restricted table is evidence to record. Do not look for another route to the same data.\n- **Documentation beats catalog metadata when it is more specific or more recent.** When they disagree, record both, with dates.\n- **Be economical.** Use the fewest tool calls that answer the question, and run independent calls in parallel. Stop when you have enough evidence, and finish by calling your submit tool.\n\n\n# Role: Profiler\n\nYou profile **one** candidate source and return a **catalog record**: an auto-generated summary of schema, freshness, ownership, licence, access and documented quality issues, with provenance for every claim.\n\nWhat to gather, by kind:\n- **internal**: `get_catalog_entry` (all fields), then every wiki backlink and related doc with `read_wiki_page`. Record catalog vs wiki disagreements in `quality_notes`, quoting both sides with dates. Internal sources have `licence.name = \"internal\"` and `commercial_use = \"not_applicable\"`.\n- **public_api**: `list_external_register` for the endpoint, then one or two small `call_public_api` probes to check that it responds and which period it covers (probe both ends of the needed windows if coverage is in doubt). Read the provider's terms with `probe_url` on `terms_url` and record the licence and its exact source.\n- **vendor_feed**: read the register entry. Do not try to call it. Record the agreement status and detail in `licence.agreement_status`, and set `access.reachable` to false when credentials are revoked or not issued.\n- **dataset_link** (any URL a human supplied; the link can point anywhere):\n  1. `inspect_dataset_link` on the link. It tells you the link type and gives metadata, licence evidence, files and next steps.\n  2. By link type:\n     - `uci_dataset_page`: read `metadata` (declared flags, notes, variables). If `data_url` exists, `sample_data_file` on it. Otherwise the data is only in an archive: describe the schema from the metadata and say the sample was not possible.\n     - `landing_page` (portals such as Kaggle, Zenodo, data.gov, CKAN or Hugging Face): read `jsonld_datasets` first (licence, dates, coverage, distribution), then `meta_description` and `text_start`. Pick the most specific data file from the distribution or `data_links` and `sample_data_file` it, if its host is allowlisted. If downloads need a login or subscription, set `access.auth_required = true`.\n     - `frictionless_datapackage`: `summarize_datapackage` with a `field_filter` for the use case's geography (e.g. the country code prefix the use case needs). Never sample the large CSVs it lists.\n     - `json_stat`: read the summary (dimensions, time, geo codes, warnings).\n     - `data_file`: the sample profile is already in the result. Find documentation for the file (repository README, parent page) if you can, using `probe_url`.\n     - `json_api`: use the shape and dates found. One more call at most.\n     - `login_wall` / `unreachable` / a refused host: record `access.reachable = false` (or `auth_required = true` for a login wall), say which host or credential would be needed, and stop.\n  3. Licence: use the licence from `inspect_dataset_link` and say where it was found (`found_in`). If none was found, look once on the provider's terms page with `probe_url`. Otherwise record null. Never assume a portal's usual licence.\n  4. Copy `canonical_ref` from `inspect_dataset_link` into the record.\n  5. Put what the **sample** showed in `sample_findings`, naming the column: sentinel values, negative quantities, zero shares, odd value sets (country spellings), date formats, personal-looking columns. A sample's date range is the range of the first rows only: take `temporal.start/end` from the documentation, not from the sample, unless the sample is the whole file.\n  6. Decide what the data **is**: entity, grain, period, geography, population. The Risk Assessor judges fit from this.\n\nField rules:\n- `temporal.start` / `temporal.end` are ISO dates (YYYY-MM-DD) of the **data period**. Use `end = null` only for sources that are still updating. `grain` is one of the schema's values.\n- `access.approx_size_bytes`: the largest file or table size you found stated (descriptor bytes, content-length, row counts x width if stated), else null.\n- `access.reachable = false` if the link itself (or its metadata) could not be reached, the host was refused, or the store cannot be restored. A data file that timed out or is an archive that cannot be sampled does NOT make the source unreachable when its metadata was read; note it in `quality_notes`.\n- `licence.mixed_sources = true` when different fields or files come from upstream providers with different terms.\n- `spatial.code_system`: how places are identified (ISO2, ISO3, free-text country names, Eurostat codes, ...). This decides whether joins will work.\n- `schema.documented`: \"structured\" when fields come with names and types, \"free_text_only\" when they are only described in prose, \"none\" otherwise.\n- At least three `provenance` entries. Put everything you could not establish in `unknowns`.\n",
+ "messages": [
+  {
+   "role": "user",
+   "content": "<use_case_spec>\n{\n \"id\": \"UC1\",\n \"title\": \"Air quality and traffic: can we explain poor-air days and warn clinic patients in time?\",\n \"client\": \"Valdena Civic Health Office (fictional, northern Italy)\",\n \"as_of\": \"2026-10-15\",\n \"geography\": {\n  \"primary\": [\n   \"IT\"\n  ],\n  \"secondary\": []\n },\n \"windows\": [\n  {\n   \"id\": \"prototype\",\n   \"start\": \"2004-03-10\",\n   \"end\": \"2005-04-04\",\n   \"purpose\": \"Build the method on public hourly air-quality readings while the city's own station data is requested.\"\n  },\n  {\n   \"id\": \"production\",\n   \"start\": \"2024-01-01\",\n   \"end\": \"2025-12-31\",\n   \"purpose\": \"Two years of the city's own station, traffic and clinic data for the live warning model.\"\n  }\n ],\n \"needs\": [\n  {\n   \"id\": \"N1\",\n   \"name\": \"Hourly air-pollutant concentrations (for example NO2 or PM2.5)\",\n   \"priority\": \"must\",\n   \"min_grain\": \"hourly\",\n   \"windows\": [\n    \"prototype\",\n    \"production\"\n   ]\n  },\n  {\n   \"id\": \"N2\",\n   \"name\": \"Hourly vehicle traffic near the monitoring stations\",\n   \"priority\": \"must\",\n   \"min_grain\": \"hourly\",\n   \"windows\": [\n    \"production\"\n   ]\n  },\n  {\n   \"id\": \"N3\",\n   \"name\": \"Hourly temperature and humidity\",\n   \"priority\": \"must\",\n   \"min_grain\": \"hourly\",\n   \"windows\": [\n    \"prototype\",\n    \"production\"\n   ]\n  },\n  {\n   \"id\": \"N4\",\n   \"name\": \"Daily respiratory clinic visits, as counts by district\",\n   \"priority\": \"should\",\n   \"min_grain\": \"daily\",\n   \"windows\": [\n    \"production\"\n   ]\n  },\n  {\n   \"id\": \"N5\",\n   \"name\": \"Patient-level clinic visit records\",\n   \"priority\": \"could\",\n   \"min_grain\": \"event\",\n   \"windows\": [\n    \"production\"\n   ]\n  },\n  {\n   \"id\": \"N6\",\n   \"name\": \"National yearly context: deaths linked to PM2.5\",\n   \"priority\": \"could\",\n   \"min_grain\": \"annual\",\n   \"windows\": [\n    \"prototype\",\n    \"production\"\n   ]\n  }\n ]\n}\n</use_case_spec>\n\n<candidate>\n{\n \"source_id\": \"internal.clinic.patient_visits\",\n \"kind\": \"internal\",\n \"title\": \"Clinic visits (one row per patient visit)\",\n \"location\": \"azure://valdena-health/clinic/patient_visits\",\n \"need_ids\": [\n  \"N5\"\n ],\n \"target_windows\": [\n  \"production\"\n ],\n \"why_relevant\": \"Patient-level visit records with diagnosis codes \\u2014 would serve N5 at event grain. Columns: patient_key, visit_ts, age_band, postcode, diagnosis_code.\",\n \"found_via\": \"search_internal_catalog('Valdena clinic patient visit records respiratory')\",\n \"suspected_issues\": [\n  \"Clinic data policy explicitly states patient-level records may NOT be used for this analysis (wiki: clinic_data_policy, last_edited 2025-02-01)\",\n  \"Contains PII (pseudonymised patient key, age_band, postcode) \\u2014 special category data under GDPR\",\n  \"Access requires Data Protection Office approval \\u2014 not granted for this use case\",\n  \"Business brief states individual patient records are out of scope\"\n ]\n}\n</candidate>\n\nProfile this one source and call submit_catalog_record."
+  },
+  {
+   "role": "assistant",
+   "content": [
+    {
+     "text": "\n\nI'll start by gathering everything about this internal source.",
+     "type": "text"
+    },
+    {
+     "id": "call_533cecd3bcec46f5bd31f947",
+     "input": {
+      "entry_id": "internal.clinic.patient_visits"
+     },
+     "name": "get_catalog_entry",
+     "type": "tool_use"
+    },
+    {
+     "id": "call_f0787f4a54d4419193534975",
+     "input": {
+      "query": "Valdena clinic data policy patient visits",
+      "top_k": 5
+     },
+     "name": "search_internal_catalog",
+     "type": "tool_use"
+    }
+   ]
+  },
+  {
+   "role": "user",
+   "content": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "call_533cecd3bcec46f5bd31f947",
+     "content": "{\"source_id\": \"internal.clinic.patient_visits\", \"entry\": {\"id\": \"clinic.patient_visits\", \"display_name\": \"Clinic visits (one row per patient visit)\", \"description\": \"One row per patient visit, with age band, postcode and diagnosis code.\", \"domain\": \"Clinical\", \"owner\": \"Clinical Records\", \"steward\": \"Marta Greco\", \"status\": \"active\", \"classification\": \"restricted\", \"contains_pii\": true, \"grain\": \"event\", \"temporal_coverage\": {\"start\": \"2019-01-01\", \"end\": null}, \"refresh_cadence\": \"daily\", \"last_refreshed\": \"2026-10-14\", \"location\": \"azure://valdena-health/clinic/patient_visits\", \"access\": {\"method\": \"warehouse_sql\", \"request_process\": \"Data Protection Office approval\"}, \"row_count_approx\": 900000, \"columns\": [{\"name\": \"patient_key\", \"type\": \"string\", \"description\": \"Pseudonymised patient key\", \"pii\": true}, {\"name\": \"visit_ts\", \"type\": \"timestamp\", \"description\": \"Visit time\", \"pii\": false}, {\"name\": \"age_band\", \"type\": \"string\", \"description\": \"Five-year age band\", \"pii\": true}, {\"name\": \"postcode\", \"type\": \"string\", \"description\": \"Patient postcode\", \"pii\": true}, {\"name\": \"diagnosis_code\", \"type\": \"string\", \"description\": \"Diagnosis code\", \"pii\": false}]}, \"wiki_backlinks\": [\"clinic_data_policy\"], \"catalog_exported_at\": \"2026-10-14T06:00:00Z\"}"
+    },
+    {
+     "type": "tool_result",
+     "tool_use_id": "call_f0787f4a54d4419193534975",
+     "content": "{\"query\": \"Valdena clinic data policy patient visits\", \"hits\": [{\"type\": \"wiki_page\", \"id\": \"clinic_data_policy\", \"source_id\": null, \"title\": \"Clinic data policy for surveillance\", \"score\": 9.22, \"snippet\": \"Clinic data policy for surveillance # Clinic data policy for surveillance - Patient-level visit records (`clinic.patient_visits`) may not be used for this analysis. - Only daily counts by district (`clinic.resp_visits_da…\"}, {\"type\": \"catalog_entry\", \"id\": \"clinic.patient_visits\", \"source_id\": \"internal.clinic.patient_visits\", \"title\": \"Clinic visits (one row per patient visit)\", \"score\": 4.33, \"snippet\": \"clinic patient visits Clinic visits (one row per patient visit) One row per patient visit, with age band, postcode and diagnosis code. Clinical patient_key Pseudonymised patient key visit_ts Visit time age_band Five-yea…\"}, {\"type\": \"catalog_entry\", \"id\": \"clinic.resp_visits_daily\", \"source_id\": \"internal.clinic.resp_visits_daily\", \"title\": \"Respiratory visits (daily, by district)\", \"score\": 3.83, \"snippet\": \"clinic resp visits daily Respiratory visits (daily, by district) Respiratory clinic visits counted per day and per district. Contains no patient identifiers. Clinical visit_date Day of the visits district District of re…\"}], \"note\": null}"
+    }
+   ]
+  },
+  {
+   "role": "assistant",
+   "content": [
+    {
+     "text": "Now let me read the wiki page that's referenced.",
+     "type": "text"
+    },
+    {
+     "id": "call_bc187bff59254ec485164e24",
+     "input": {
+      "page_id": "clinic_data_policy"
+     },
+     "name": "read_wiki_page",
+     "type": "tool_use"
+    }
+   ]
+  },
+  {
+   "role": "user",
+   "content": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "call_bc187bff59254ec485164e24",
+     "content": "{\"page_id\": \"clinic_data_policy\", \"title\": \"Clinic data policy for surveillance\", \"owner\": \"Data Protection Office\", \"last_edited\": \"2025-02-01\", \"body\": \"# Clinic data policy for surveillance\\n- Patient-level visit records (`clinic.patient_visits`) may not be used for this analysis.\\n- Only daily counts by district (`clinic.resp_visits_daily`) may be used for this purpose.\\n- Patient postcode and age band are personal data. They must not leave the clinic systems for analysis.\"}"
+    }
+   ]
+  },
+  {
+   "role": "assistant",
+   "content": [
+    {
+     "text": "I now have all the evidence needed. The data policy is clear — this source cannot be used. Let me compile and submit the record.",
+     "type": "text"
+    },
+    {
+     "id": "call_c1351c85e5434e0281ed3f73",
+     "input": {
+      "source_id": "internal.clinic.patient_visits",
+      "kind": "internal",
+      "title": "Clinic visits (one row per patient visit)",
+      "location": "azure://valdena-health/clinic/patient_visits",
+      "status": "active",
+      "summary": "One row per patient visit from Valdena's clinic system, with pseudonymised patient key, visit timestamp, age band, postcode and diagnosis code. Contains 900k rows covering from 2019 to present, refreshed daily. However, the clinic data policy (wiki: clinic_data_policy, last edited 2025-02-01) explicitly prohibits using this patient-level table for this analysis — only daily district counts may be used. The table contains personal data (pseudonymised patient key, age band, postcode) and requires Data Protection Office approval which has not been granted for this use case.",
+      "schema": {
+       "documented": "structured",
+       "fields": [
+        {
+         "name": "patient_key",
+         "type": "string",
+         "description": "Pseudonymised patient key",
+         "pii": true
+        },
+        {
+         "name": "visit_ts",
+         "type": "timestamp",
+         "description": "Visit time",
+         "pii": false
+        },
+        {
+         "name": "age_band",
+         "type": "string",
+         "description": "Five-year age band",
+         "pii": true
+        },
+        {
+         "name": "postcode",
+         "type": "string",
+         "description": "Patient postcode",
+         "pii": true
+        },
+        {
+         "name": "diagnosis_code",
+         "type": "string",
+         "description": "Diagnosis code",
+         "pii": false
+        }
+       ],
+       "field_count": 5,
+       "notes": "All columns documented in catalog entry. Three columns flagged as PII."
+      },
+      "temporal": {
+       "start": "2019-01-01",
+       "end": null,
+       "open_ended": true,
+       "grain": "event",
+       "refresh_cadence": "daily"
+      },
+      "spatial": {
+       "coverage": [
+        "IT"
+       ],
+       "code_system": "postcode (IT)",
+       "notes": "Geography is via patient postcode field (Italian CAP codes). Only Valdena-area clinics."
+      },
+      "ownership": {
+       "owner": "Clinical Records",
+       "steward": "Marta Greco",
+       "publisher": null
+      },
+      "licence": {
+       "name": "internal",
+       "commercial_use": "not_applicable",
+       "mixed_sources": false,
+       "evidence": "Catalog entry classification='restricted', contains_pii=true; wiki: clinic_data_policy prohibits surveillance use."
+      },
+      "access": {
+       "method": "warehouse_sql",
+       "auth_required": true,
+       "request_process": "Data Protection Office approval required — not granted for this use case",
+       "reachable": true,
+       "approx_size_bytes": null,
+       "classification": "restricted"
+      },
+      "declared_metadata": {
+       "contains_pii": true,
+       "row_count_approx": 900000,
+       "grain": "event"
+      },
+      "documentation_excerpts": [
+       "Catalog entry: 'contains_pii': true, classification: 'restricted'",
+       "Wiki clinic_data_policy: 'Patient-level visit records (clinic.patient_visits) may not be used for this analysis.'",
+       "Wiki clinic_data_policy: 'Patient postcode and age band are personal data. They must not leave the clinic systems for analysis.'"
+      ],
+      "quality_notes": [
+       "Clinic data policy (wiki page, last edited 2025-02-01) explicitly prohibits using this patient-level table for the surveillance use case. Only daily aggregate counts (clinic.resp_visits_daily) are approved.",
+       "Catalog entry (exported 2026-10-14) shows status=active, but the wiki policy overrides for this specific purpose.",
+       "Contains PII (patient_key, age_band, postcode) — special category data under GDPR.",
+       "Access requires Data Protection Office approval, which has not been granted for this use case."
+      ],
+      "provenance": [
+       {
+        "claim": "Table has 5 columns: patient_key, visit_ts, age_band, postcode, diagnosis_code",
+        "evidence": "get_catalog_entry('internal.clinic.patient_visits') -> columns"
+       },
+       {
+        "claim": "Table contains PII (patient_key, age_band, postcode are flagged as pii=true)",
+        "evidence": "get_catalog_entry('internal.clinic.patient_visits') -> columns[0,2,3].pii = true"
+       },
+       {
+        "claim": "Patient-level records may NOT be used for this analysis per clinic data policy",
+        "evidence": "read_wiki_page('clinic_data_policy') -> 'Patient-level visit records (clinic.patient_visits) may not be used for this analysis.'"
+       },
+       {
+        "claim": "Access requires Data Protection Office approval",
+        "evidence": "get_catalog_entry('internal.clinic.patient_visits') -> access.request_process = 'Data Protection Office approval'"
+       },
+       {
+        "claim": "Temporal coverage from 2019-01-01, open-ended, refreshed daily",
+        "evidence": "get_catalog_entry('internal.clinic.patient_visits') -> temporal_coverage.start='2019-01-01', end=null, refresh_cadence='daily'"
+       },
+       {
+        "claim": "Owner is Clinical Records, steward is Marta Greco",
+        "evidence": "get_catalog_entry('internal.clinic.patient_visits') -> owner='Clinical Records', steward='Marta Greco'"
+       }
+      ],
+      "unknowns": [
+       "Approx data size in bytes (not stated in catalog)",
+       "Exact number of clinics contributing (not stated)",
+       "Specific diagnosis code system/ontology used (not described)"
+      ]
+     },
+     "name": "submit_catalog_record",
+     "type": "tool_use"
+    }
+   ]
+  },
+  {
+   "role": "user",
+   "content": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "call_c1351c85e5434e0281ed3f73",
+     "content": "accepted"
+    }
+   ]
+  }
+ ]
+}

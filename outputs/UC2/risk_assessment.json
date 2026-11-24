@@ -1,0 +1,167 @@
+{
+  "assessments": [
+    {
+      "source_id": "api.nager_public_holidays",
+      "verdict": "feasible",
+      "red_flags": [],
+      "dismissed_rule_flags": [],
+      "conditions": [],
+      "who_can_resolve": [],
+      "rationale": "MIT-licensed public API providing all Italian national public holidays. No API key required. Covers 2023-2026 fully at daily grain. Registered and approved for UC2 prototyping and production. Can serve N4 (should priority) without any blockers or conditions."
+    },
+    {
+      "source_id": "api.open_meteo_archive",
+      "verdict": "feasible_with_conditions",
+      "red_flags": [
+        {
+          "code": "LIC-ATTRIBUTION",
+          "evidence": "Licence CC BY 4.0 requires attribution text: 'Weather data by Open-Meteo.com (https://open-meteo.com/)'. Source: record.licence.attribution_text and probe_url https://open-meteo.com/en/licence",
+          "severity": "minor"
+        },
+        {
+          "code": "LIC-MIXED",
+          "evidence": "Record states mixed_sources=true. Upstream data from ERA5/ERA5-Land (Copernicus ECMWF) and ECMWF IFS, each with different terms. Source: record.licence.mixed_sources and licence.evidence",
+          "severity": "major"
+        },
+        {
+          "code": "ACC-RESTRICTED",
+          "evidence": "auth_required=true. Free tier is non-commercial only. Valdena Gelato Shop (commercial entity) needs a paid subscription at https://open-meteo.com/en/pricing. Source: record.access.auth_required, record.documentation_excerpts, record.access.request_process",
+          "severity": "major"
+        }
+      ],
+      "conditions": [
+        "Obtain a paid commercial subscription (Standard/Professional/Enterprise) from Open-Meteo.com for commercial use of the API",
+        "Attribute weather data per CC BY 4.0 with text 'Weather data by Open-Meteo.com (https://open-meteo.com/)'",
+        "Provide the exact GPS coordinates of the Valdena shop to get the nearest grid-cell temperature"
+      ],
+      "who_can_resolve": [
+        "Project lead / Data Engineering (to purchase subscription)",
+        "Data analyst (to provide coordinates and implement attribution)"
+      ],
+      "rationale": "Daily temperature_2m_max from ERA5 reanalysis covers both windows fully at daily grain. Registered and approved for UC2 prototyping and production. However, the free tier restricts to non-commercial use; Valdena Gelato Shop is a commercial entity. A paid subscription is obtainable (the source is approved for production). LIC-MIXED is flagged because ERA5 and IFS data come from different upstream providers, but the API itself offers CC BY 4.0 terms. Conditions are achievable."
+    },
+    {
+      "source_id": "internal.sales.daily_by_product",
+      "verdict": "feasible_with_conditions",
+      "red_flags": [
+        {
+          "code": "ACC-RESTRICTED",
+          "evidence": "auth_required=true, classification=confidential, request_process='Request to Retail Operations'. Source: record.access and catalog entry",
+          "severity": "major"
+        },
+        {
+          "code": "COV-PARTIAL-WINDOW",
+          "evidence": "History window (2023-06-01 to 2025-05-31) has a 34-day gap from 2024-02-05 to 2024-03-10 due to till system replacement, during which no rows were recorded. Source: wiki till_migration_2024",
+          "severity": "major"
+        },
+        {
+          "code": "INT-JOIN-KEY-MISMATCH",
+          "evidence": "Product codes changed on 2024-04-01: old codes ending 'L' were replaced by new codes. No mapping table exists. This creates a join-key discontinuity within the history window. Source: wiki product_codes_2024",
+          "severity": "major"
+        },
+        {
+          "code": "DQ-SEMANTIC-ENCODING",
+          "evidence": "Product codes ending 'L' before 2024-04-01 vs different codes after. The meaning ('which product') is hidden in different code systems across the break. Source: wiki product_codes_2024",
+          "severity": "major"
+        }
+      ],
+      "conditions": [
+        "Obtain access approval from Retail Operations (owner: Retail Operations, steward: Marco Bianchi)",
+        "Handle the 34-day gap (2024-02-05 to 2024-03-10) as missing data, not zero sales",
+        "For the product code change on 2024-04-01: match old and new codes via product name from internal.sales.products, accepting that some names are not unique and will produce ambiguous mappings"
+      ],
+      "who_can_resolve": [
+        "Data analyst / Data Engineer (to request access from Retail Operations)",
+        "Retail Operations / Marco Bianchi (to approve access)",
+        "Data analyst (to attempt product name matching and document which names are non-unique)"
+      ],
+      "rationale": "Core source for N1 (must). Provides daily units_sold and revenue_eur per product for both windows. However: (1) Access requires approval from Retail Operations (confidential classification). (2) A 34-day gap exists from 2024-02-05 to 2024-03-10 due to till replacement. (3) Product codes changed on 2024-04-01 with no mapping table; matching by product name is possible but some names are not unique (wiki product_codes_2024), creating a join-key discontinuity. This also impacts N2. The data is otherwise complete for both windows. Conditions are achievable with analyst effort."
+    },
+    {
+      "source_id": "internal.sales.products",
+      "verdict": "feasible_with_conditions",
+      "red_flags": [
+        {
+          "code": "ACC-RESTRICTED",
+          "evidence": "auth_required=true, classification=internal, request_process='Open to analytics roles'. Source: record.access and catalog entry",
+          "severity": "major"
+        },
+        {
+          "code": "INT-JOIN-KEY-MISMATCH",
+          "evidence": "Only contains current (post-2024) product codes. Pre-2024 codes ending 'L' are not present. No mapping table exists between old and new codes. Some product names are not unique. Source: wiki product_codes_2024",
+          "severity": "major"
+        }
+      ],
+      "conditions": [
+        "Access is open to analytics roles, so request should be straightforward",
+        "Use product_name to attempt matching old and new codes, document which names are non-unique and exclude those from cross-period analysis",
+        "If the mapping is needed for all products, a manual reconciliation with the shop owner (Marco Bianchi / Retail Operations) may be necessary"
+      ],
+      "who_can_resolve": [
+        "Data analyst (to perform name matching)",
+        "Retail Operations / Marco Bianchi (if manual reconciliation of non-unique names is needed)"
+      ],
+      "rationale": "Static reference table of 64 current product codes with names and categories. Serves as the decoding key for post-2024 product_codes in sales.daily_by_product. For N2 (must), it provides the product names needed to attempt matching old and new codes across the 2024-04-01 break. However, the wiki explicitly states no mapping table exists and some names are not unique, so the mapping will be incomplete. Also supports N1 by providing product names and categories for the post-2024 period."
+    },
+    {
+      "source_id": "internal.store.calendar",
+      "verdict": "feasible",
+      "red_flags": [
+        {
+          "code": "ACC-RESTRICTED",
+          "evidence": "auth_required=true, classification=internal, request_process='Open to analytics roles'. Source: record.access and catalog entry",
+          "severity": "major"
+        }
+      ],
+      "conditions": [],
+      "who_can_resolve": [],
+      "rationale": "Daily calendar with is_open flag and event_name for the Valdena shop. Covers both windows (2022-01-01 onward, refreshed weekly, last refreshed 2026-10-10). N5 is a 'should' priority need. Access is 'open to analytics roles' which is a standard internal process. No wiki documentation to cross-reference (no backlinks), but catalog documentation is consistent. The event_name field may be sparse ('if any' in catalog description), but this is acceptable for a supplementary need. Verdict: feasible."
+    }
+  ],
+  "need_coverage": [
+    {
+      "need_id": "N1",
+      "status": "met_with_conditions",
+      "best_sources": [
+        "internal.sales.daily_by_product",
+        "internal.sales.products"
+      ],
+      "gap": "Daily sales data exists for both windows. However: (1) 34-day gap from 2024-02-05 to 2024-03-10 (till migration) has no recorded data. (2) Product code change on 2024-04-01 with no mapping table means cross-period analysis requires name matching, which is unreliable for non-unique product names."
+    },
+    {
+      "need_id": "N2",
+      "status": "partially_met",
+      "best_sources": [
+        "internal.sales.products",
+        "internal.sales.daily_by_product"
+      ],
+      "gap": "No mapping table exists between old (L-ending, pre-2024) and new (post-2024) product codes (wiki product_codes_2024). Matching by product name is possible but some names are not unique, making the mapping incomplete. Manual reconciliation with shop owner may help but some ambiguity remains."
+    },
+    {
+      "need_id": "N3",
+      "status": "met_with_conditions",
+      "best_sources": [
+        "api.open_meteo_archive"
+      ],
+      "gap": "Daily max temperature data covers both windows fully at daily grain from ERA5 reanalysis. Condition: a paid commercial subscription is required since Valdena is a commercial entity and the free tier is non-commercial only. Attribution under CC BY 4.0 must be provided."
+    },
+    {
+      "need_id": "N4",
+      "status": "met",
+      "best_sources": [
+        "api.nager_public_holidays"
+      ],
+      "gap": null
+    },
+    {
+      "need_id": "N5",
+      "status": "met",
+      "best_sources": [
+        "internal.store.calendar"
+      ],
+      "gap": null
+    }
+  ],
+  "overall_verdict": "feasible_with_conditions",
+  "overall_rationale": "All three must needs (N1, N2, N3) can be served but all require conditions. N1 (daily sales) has a 34-day gap due to till migration and a product-code discontinuity requiring name-based matching. N2 (product code mapping) is only partially met because no mapping table exists and some product names are not unique, so the mapping will be incomplete. N3 (daily max temperature) requires a paid commercial subscription to Open-Meteo. The must needs drive the verdict: N1 and N3 are met_with_conditions (achievable), and N2 is partially_met (mapping via name with non-unique names is the best possible). The should-priority needs (N4, N5) are fully met. No blocker-severity flags are triggered on any source serving must needs. The conditions are actionable."
+}

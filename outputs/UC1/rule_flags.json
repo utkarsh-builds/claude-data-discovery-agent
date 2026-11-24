@@ -1,0 +1,103 @@
+{
+  "flags": {
+    "api.nager_public_holidays": [],
+    "api.open_meteo_archive": [
+      {
+        "code": "LIC-ATTRIBUTION",
+        "evidence": "Licence 'CC BY 4.0' requires attribution",
+        "raised_by": "rule:rule_licence"
+      },
+      {
+        "code": "LIC-MIXED",
+        "evidence": "Record states that parts come from upstream providers with different terms",
+        "raised_by": "rule:rule_licence"
+      }
+    ],
+    "internal.airq.station_readings": [
+      {
+        "code": "ACC-RESTRICTED",
+        "evidence": "auth_required=True, classification=internal, process='Request to the Environment Monitoring Unit'",
+        "raised_by": "rule:rule_access"
+      }
+    ],
+    "internal.clinic.patient_visits": [
+      {
+        "code": "ACC-RESTRICTED",
+        "evidence": "auth_required=True, classification=restricted, process='Data Protection Office approval required — not granted for this use case'",
+        "raised_by": "rule:rule_access"
+      },
+      {
+        "code": "GOV-PII",
+        "evidence": "PII fields: ['patient_key', 'age_band', 'postcode']",
+        "raised_by": "rule:rule_pii"
+      }
+    ],
+    "internal.clinic.resp_visits_daily": [],
+    "internal.traffic.hourly_counts": [
+      {
+        "code": "ACC-RESTRICTED",
+        "evidence": "auth_required=True, classification=internal, process='Request to the Mobility Office'",
+        "raised_by": "rule:rule_access"
+      }
+    ],
+    "link.data_open_air_chicago_hour_aggre_d4970b": [
+      {
+        "code": "LIC-UNKNOWN",
+        "evidence": "No licence established. Evidence field: 'Could not be read: host catalog.data.gov is not allowlisted.'",
+        "raised_by": "rule:rule_licence"
+      },
+      {
+        "code": "ACC-UNREACHABLE",
+        "evidence": "Record states the source could not be reached or restored",
+        "raised_by": "rule:rule_access"
+      }
+    ],
+    "link.europa_sdg_11_52_099aa6": [
+      {
+        "code": "COV-PARTIAL-WINDOW",
+        "evidence": "prototype: 2005-01-01 to 2023-12-31; production: 2005-01-01 to 2023-12-31",
+        "raised_by": "rule:rule_temporal_coverage"
+      }
+    ],
+    "link.uci_360": [
+      {
+        "code": "LIC-ATTRIBUTION",
+        "evidence": "Licence 'CC BY 4.0' requires attribution",
+        "raised_by": "rule:rule_licence"
+      },
+      {
+        "code": "FRS-STALE",
+        "evidence": "Data ends 2005-04-04, which is >5 years before 2026-10-15",
+        "raised_by": "rule:rule_temporal_coverage"
+      }
+    ],
+    "vendor.atmosdata_pro": [
+      {
+        "code": "LIC-UNKNOWN",
+        "evidence": "No licence established. Evidence field: 'list_external_register() output for source_id=vendor.atmosdata_pro: agreement_status=expired, agreement_detail states contract dates and renewal status'",
+        "raised_by": "rule:rule_licence"
+      },
+      {
+        "code": "LIC-AGREEMENT-NOT-ACTIVE",
+        "evidence": "Vendor feed with agreement_status='expired — contract ad-2021-114 ran 2022-01-01 to 2025-12-31. renewal pending procurement, no signed renewal on file.'",
+        "raised_by": "rule:rule_agreement"
+      },
+      {
+        "code": "ACC-RESTRICTED",
+        "evidence": "auth_required=True, classification=None, process='API key needed; was revoked 2026-01-01. Renewal requires a signed agreement through Procurement.'",
+        "raised_by": "rule:rule_access"
+      },
+      {
+        "code": "ACC-UNREACHABLE",
+        "evidence": "Record states the source could not be reached or restored",
+        "raised_by": "rule:rule_access"
+      },
+      {
+        "code": "GOV-DEPRECATED",
+        "evidence": "status='deprecated'",
+        "raised_by": "rule:rule_status"
+      }
+    ]
+  },
+  "warnings": []
+}

@@ -1,0 +1,132 @@
+{
+  "source_id": "internal.sales.daily_by_product",
+  "kind": "internal",
+  "title": "Daily sales by product",
+  "location": "azure://valdena-gelato/sales/daily_by_product",
+  "status": "active",
+  "summary": "Daily ice-cream units sold and revenue in euros per product from the Valdena Gelato Shop till system (northern Italy). Each row is one product on one day. Covers 2022-01-01 to present, refreshed daily. A till system replacement between 2024-02-05 and 2024-03-10 caused a gap (no rows recorded). Product codes changed on 2024-04-01: old codes ending \"L\" replaced by new codes, with no mapping table available. The product list (sales.products) only holds current codes.",
+  "schema": {
+    "documented": "structured",
+    "fields": [
+      {
+        "name": "sale_date",
+        "type": "date",
+        "description": "Day of sale",
+        "pii": false
+      },
+      {
+        "name": "product_code",
+        "type": "string",
+        "description": "Product code; codes ending L used until 2024-03-31, different codes from 2024-04-01",
+        "pii": false
+      },
+      {
+        "name": "units_sold",
+        "type": "integer",
+        "description": "Units sold that day",
+        "pii": false
+      },
+      {
+        "name": "revenue_eur",
+        "type": "numeric",
+        "description": "Revenue in euros that day",
+        "pii": false
+      }
+    ],
+    "field_count": 4,
+    "notes": "The product_code field has a discontinuity on 2024-04-01. See quality_notes."
+  },
+  "temporal": {
+    "start": "2022-01-01",
+    "end": null,
+    "open_ended": true,
+    "grain": "daily",
+    "refresh_cadence": "daily",
+    "metadata_last_updated": "2026-10-14"
+  },
+  "spatial": {
+    "coverage": [
+      "IT"
+    ],
+    "code_system": null,
+    "notes": "Single Valdena Gelato Shop location in northern Italy. No location column in data."
+  },
+  "ownership": {
+    "owner": "Retail Operations",
+    "steward": "Marco Bianchi",
+    "publisher": null
+  },
+  "licence": {
+    "name": "internal",
+    "url": null,
+    "commercial_use": "not_applicable",
+    "mixed_sources": false,
+    "attribution_text": null,
+    "agreement_status": null,
+    "evidence": "catalog entry domain=Retail, classification=confidential; internal source per profiling rules"
+  },
+  "access": {
+    "method": "warehouse_sql",
+    "auth_required": true,
+    "request_process": "Request to Retail Operations",
+    "reachable": true,
+    "approx_size_bytes": null,
+    "classification": "confidential"
+  },
+  "declared_metadata": {
+    "contains_pii": false,
+    "row_count_approx": 310000
+  },
+  "documentation_excerpts": [
+    "Catalog description: 'Units sold and revenue per product per day, from the till system.'",
+    "Wiki till_migration_2024: 'No sales were recorded in that period. Treat those days as missing, not as zero sales.'",
+    "Wiki product_codes_2024: 'No mapping table exists between the old and new codes.'",
+    "Wiki product_codes_2024: 'Old and new codes can only be matched by product name, and some names are not unique.'"
+  ],
+  "quality_notes": [
+    "Till system replacement 2024-02-05 to 2024-03-10: no rows recorded for those 34 days. Do not impute as zero (wiki: till_migration_2024, last_edited 2024-03-12).",
+    "Product codes changed on 2024-04-01. Old codes (ending L) differ from new codes. No mapping table exists (wiki: product_codes_2024, last_edited 2024-04-02). Only current codes are in sales.products catalog entry. Historical analysis across the break requires matching by product name, but some names are not unique.",
+    "The candidate noted suspected issue 'Access via warehouse SQL — needs request to Retail Operations'. Catalog confirms method=warehouse_sql, request_process='Request to Retail Operations'.",
+    "catalog temporal_coverage.start=2022-01-01, end=null; refresh_cadence=daily; last_refreshed=2026-10-14."
+  ],
+  "provenance": [
+    {
+      "claim": "Table has 4 columns: sale_date, product_code, units_sold, revenue_eur",
+      "evidence": "get_catalog_entry internal.sales.daily_by_product — columns section"
+    },
+    {
+      "claim": "Temporal coverage starts 2022-01-01, is open-ended, refreshed daily",
+      "evidence": "get_catalog_entry internal.sales.daily_by_product — temporal_coverage"
+    },
+    {
+      "claim": "Till gap from 2024-02-05 to 2024-03-10 with no rows recorded",
+      "evidence": "read_wiki_page till_migration_2024 — body"
+    },
+    {
+      "claim": "No product code mapping exists between old (L-ending) and new codes from 2024-04-01",
+      "evidence": "read_wiki_page product_codes_2024 — body"
+    },
+    {
+      "claim": "Owner is Retail Operations, steward Marco Bianchi",
+      "evidence": "get_catalog_entry internal.sales.daily_by_product — owner/steward"
+    },
+    {
+      "claim": "Access requires request to Retail Operations via warehouse SQL",
+      "evidence": "get_catalog_entry internal.sales.daily_by_product — access.method and request_process"
+    },
+    {
+      "claim": "Classification is confidential",
+      "evidence": "get_catalog_entry internal.sales.daily_by_product — classification"
+    },
+    {
+      "claim": "Approx 310,000 rows",
+      "evidence": "get_catalog_entry internal.sales.daily_by_product — row_count_approx"
+    }
+  ],
+  "unknowns": [
+    "Approximate size in bytes: not stated in catalog or wiki.",
+    "Spatial code system: no location or geography column in the table; the shop is a single known location.",
+    "Exact schema of old vs new product codes: not documented beyond 'codes ending L were replaced'.",
+    "Whether product_code values before and after 2024-04-01 could overlap (i.e. some new codes match old ones)."
+  ]
+}

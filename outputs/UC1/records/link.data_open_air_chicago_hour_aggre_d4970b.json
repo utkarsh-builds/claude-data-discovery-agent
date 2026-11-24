@@ -1,0 +1,77 @@
+{
+  "source_id": "link.data_open_air_chicago_hour_aggre_d4970b",
+  "kind": "dataset_link",
+  "title": "Dataset link: https://catalog.data.gov/dataset/open-air-chicago-hour-aggregations",
+  "summary": "A dataset link to open-air Chicago hour aggregations on catalog.data.gov, a US federal government data portal. The source could not be reached because the host catalog.data.gov is not on the client's allowlist. No metadata, schema, sample or licence could be retrieved. The source is irrelevant to the primary geography (Italy) and was listed only for the prototype window, but access is blocked regardless.",
+  "schema": {
+    "documented": "none",
+    "fields": [],
+    "field_count": null,
+    "notes": "No schema could be retrieved; host was refused."
+  },
+  "temporal": {
+    "start": null,
+    "end": null,
+    "grain": "unknown",
+    "refresh_cadence": null,
+    "metadata_last_updated": null
+  },
+  "spatial": {
+    "coverage": [],
+    "code_system": null,
+    "notes": "Expected to be US/Chicago based on the title, but no metadata was read."
+  },
+  "ownership": {
+    "owner": null,
+    "steward": null,
+    "publisher": null
+  },
+  "licence": {
+    "name": null,
+    "url": null,
+    "commercial_use": "unknown",
+    "mixed_sources": null,
+    "attribution_text": null,
+    "agreement_status": null,
+    "evidence": "Not reached — host catalog.data.gov is not allowlisted."
+  },
+  "access": {
+    "method": "file_download",
+    "auth_required": null,
+    "request_process": "The host catalog.data.gov is not on the client's allowlist. Access would require the host to be approved or the data to be obtained through another route.",
+    "reachable": false,
+    "approx_size_bytes": null,
+    "classification": null
+  },
+  "declared_metadata": {},
+  "documentation_excerpts": [],
+  "quality_notes": [
+    "Host catalog.data.gov refused (DOMAIN_NOT_ALLOWLISTED) — do not attempt another route to the same data.",
+    "Even if accessible, this dataset covers Chicago (USA), not northern Italy, so it would not be suitable for the primary geography of this use case.",
+    "Listed only for the prototype window (2004-2005) which requires Italian air-quality data."
+  ],
+  "provenance": [
+    {
+      "claim": "The source is hosted on catalog.data.gov, which is not on the client's allowlist.",
+      "evidence": "inspect_dataset_link('https://catalog.data.gov/dataset/open-air-chicago-hour-aggregations') returned DOMAIN_NOT_ALLOWLISTED"
+    },
+    {
+      "claim": "The source title suggests Chicago (US) air data, not relevant to Italy.",
+      "evidence": "source title: 'open-air-chicago-hour-aggregations' from candidate metadata"
+    },
+    {
+      "claim": "No metadata, schema, licence or sample could be retrieved.",
+      "evidence": "inspect_dataset_link failed before any metadata could be read"
+    }
+  ],
+  "unknowns": [
+    "Licence — not read because host was refused.",
+    "Schema and field names — not read.",
+    "Temporal coverage — not read.",
+    "Spatial coverage — assumed Chicago, IL, USA from the dataset title, but not confirmed.",
+    "Owner, steward, publisher — not read.",
+    "Data quality — not assessed."
+  ],
+  "canonical_ref": "catalog.data.gov/dataset/open-air-chicago-hour-aggregations",
+  "sample_findings": []
+}
